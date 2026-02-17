@@ -1,0 +1,52 @@
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+#google_translate_element {
+  display: none;
+}
+
+.goog-tooltip {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.ri-custom {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.story-content p {
+  margin: 0 0 1.25rem;
+}
+
+.story-content h2,
+.story-content h3,
+.story-content h4 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  color: #2e6f5b;
+  line-height: 1.2;
+  margin: 2rem 0 1rem;
+}
+
+.story-content a {
+  color: #2e6f5b;
+  text-decoration: underline;
+}
