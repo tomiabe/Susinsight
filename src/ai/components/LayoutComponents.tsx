@@ -194,10 +194,10 @@ export const Header: React.FC<HeaderProps> = ({ navItems }) => {
                 )}
               </div>
               <div className="h-6 w-px bg-stone-200 hidden md:block"></div>
-              <button className="flex items-center gap-2 text-stone-500 hover:text-brand-primary transition-colors">
+              <a href="/search" className="flex items-center gap-2 text-stone-500 hover:text-brand-primary transition-colors">
                  <span className="hidden md:inline font-heading font-bold text-xs uppercase tracking-widest">Search</span>
                  <Search className="w-5 h-5" />
-              </button>
+              </a>
             </div>
           </div>
         </div>
