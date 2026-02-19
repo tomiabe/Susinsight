@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Footer, Header } from "@/ai/components/LayoutComponents";
-import { getNavigationData, getPageByUri } from "@/ai/live-data";
+import { getNavigationData, getPageByUri, getStoryBySlug } from "@/ai/live-data";
 import { absoluteUrl } from "@/ai/site-url";
 
 type CatchAllPageProps = {
@@ -48,7 +48,16 @@ export default async function CatchAllPage({ params }: CatchAllPageProps) {
     getNavigationData()
   ]);
 
-  if (!page) return notFound();
+  if (!page) {
+    const lastSegment = params.slug[params.slug.length - 1] || "";
+    if (lastSegment) {
+      const story = await getStoryBySlug(lastSegment, { preview: draft.isEnabled });
+      if (story?.slug) {
+        redirect(`/stories/${story.slug}`);
+      }
+    }
+    return notFound();
+  }
 
   return (
     <div className="min-h-screen bg-white text-brand-dark">
