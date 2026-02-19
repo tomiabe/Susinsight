@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Footer, Header } from "@/ai/components/LayoutComponents";
 import { getNavigationData, getTagArchive } from "@/ai/live-data";
+import { absoluteUrl } from "@/ai/site-url";
 
 type TagPageProps = {
   params: {
@@ -31,7 +32,15 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
 
   return {
     title: `${archive.name} | Susinsight`,
-    description: stripHtml(archive.description) || `Stories tagged ${archive.name}`
+    description: stripHtml(archive.description) || `Stories tagged ${archive.name}`,
+    alternates: {
+      canonical: absoluteUrl(`/tag/${archive.slug}`)
+    },
+    openGraph: {
+      title: `${archive.name} | Susinsight`,
+      description: stripHtml(archive.description) || `Stories tagged ${archive.name}`,
+      url: absoluteUrl(`/tag/${archive.slug}`)
+    }
   };
 }
 

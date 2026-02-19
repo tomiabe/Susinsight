@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Footer, Header } from "@/ai/components/LayoutComponents";
 import { getAuthorArchive, getNavigationData } from "@/ai/live-data";
+import { absoluteUrl } from "@/ai/site-url";
 
 type AuthorPageProps = {
   params: {
@@ -31,7 +32,15 @@ export async function generateMetadata({ params }: AuthorPageProps): Promise<Met
 
   return {
     title: `${archive.name} | Susinsight`,
-    description: stripHtml(archive.description) || `${archive.name} on Susinsight`
+    description: stripHtml(archive.description) || `${archive.name} on Susinsight`,
+    alternates: {
+      canonical: absoluteUrl(`/author/${archive.slug}`)
+    },
+    openGraph: {
+      title: `${archive.name} | Susinsight`,
+      description: stripHtml(archive.description) || `${archive.name} on Susinsight`,
+      url: absoluteUrl(`/author/${archive.slug}`)
+    }
   };
 }
 

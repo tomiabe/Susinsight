@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
 import { Footer, Header } from "@/ai/components/LayoutComponents";
 import { getNavigationData, getStoriesFeed } from "@/ai/live-data";
+import { absoluteUrl } from "@/ai/site-url";
 
 export const metadata: Metadata = {
   title: "Stories | Susinsight",
-  description: "Latest stories from the Susinsight newsroom."
+  description: "Latest stories from the Susinsight newsroom.",
+  alternates: {
+    canonical: absoluteUrl("/stories")
+  },
+  openGraph: {
+    title: "Stories | Susinsight",
+    description: "Latest stories from the Susinsight newsroom.",
+    url: absoluteUrl("/stories")
+  }
 };
 
 type StoriesArchivePageProps = {

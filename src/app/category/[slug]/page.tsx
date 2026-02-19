@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Footer, Header } from "@/ai/components/LayoutComponents";
 import { getCategoryArchive, getNavigationData } from "@/ai/live-data";
+import { absoluteUrl } from "@/ai/site-url";
 
 type CategoryPageProps = {
   params: {
@@ -31,7 +32,15 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
   return {
     title: `${archive.name} | Susinsight`,
-    description: stripHtml(archive.description) || `Stories in ${archive.name}`
+    description: stripHtml(archive.description) || `Stories in ${archive.name}`,
+    alternates: {
+      canonical: absoluteUrl(`/category/${archive.slug}`)
+    },
+    openGraph: {
+      title: `${archive.name} | Susinsight`,
+      description: stripHtml(archive.description) || `Stories in ${archive.name}`,
+      url: absoluteUrl(`/category/${archive.slug}`)
+    }
   };
 }
 

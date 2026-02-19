@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Footer, Header } from "@/ai/components/LayoutComponents";
 import { getNavigationData, getSearchResults } from "@/ai/live-data";
+import { absoluteUrl } from "@/ai/site-url";
 
 type SearchPageProps = {
   searchParams?: {
@@ -24,10 +25,33 @@ function pageHref(page: number, query: string): string {
   return `/search?${qp.toString()}`;
 }
 
-export const metadata: Metadata = {
-  title: "Search | Susinsight",
-  description: "Search stories on Susinsight."
-};
+export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
+  const query = (searchParams?.q || "").trim();
+  if (!query) {
+    return {
+      title: "Search | Susinsight",
+      description: "Search stories on Susinsight.",
+      alternates: { canonical: absoluteUrl("/search") },
+      openGraph: {
+        title: "Search | Susinsight",
+        description: "Search stories on Susinsight.",
+        url: absoluteUrl("/search")
+      }
+    };
+  }
+
+  const canonical = absoluteUrl(`/search?q=${encodeURIComponent(query)}`);
+  return {
+    title: `Search: ${query} | Susinsight`,
+    description: `Search results for ${query} on Susinsight.`,
+    alternates: { canonical },
+    openGraph: {
+      title: `Search: ${query} | Susinsight`,
+      description: `Search results for ${query} on Susinsight.`,
+      url: canonical
+    }
+  };
+}
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const query = (searchParams?.q || "").trim();
