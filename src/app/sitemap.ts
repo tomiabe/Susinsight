@@ -1,16 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getSitemapEntries } from "@/ai/live-data";
-
-function resolveSiteUrl(): string {
-  const raw =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.SITE_URL ||
-    "https://susinsight.vercel.app";
-  return raw.endsWith("/") ? raw.slice(0, -1) : raw;
-}
+import { getSiteUrl } from "@/ai/site-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = resolveSiteUrl();
+  const siteUrl = getSiteUrl();
   const wpEntries = await getSitemapEntries();
 
   const baseEntries: MetadataRoute.Sitemap = [

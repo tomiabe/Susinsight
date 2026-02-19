@@ -3,6 +3,7 @@ import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Footer, Header } from "@/ai/components/LayoutComponents";
 import { getNavigationData, getPageByUri } from "@/ai/live-data";
+import { absoluteUrl } from "@/ai/site-url";
 
 type CatchAllPageProps = {
   params: {
@@ -27,7 +28,15 @@ export async function generateMetadata({ params }: CatchAllPageProps): Promise<M
 
   return {
     title: `${stripHtml(page.title)} | Susinsight`,
-    description: stripHtml(page.excerpt || page.content)
+    description: stripHtml(page.excerpt || page.content),
+    alternates: {
+      canonical: absoluteUrl(uri)
+    },
+    openGraph: {
+      title: stripHtml(page.title),
+      description: stripHtml(page.excerpt || page.content),
+      url: absoluteUrl(uri)
+    }
   };
 }
 

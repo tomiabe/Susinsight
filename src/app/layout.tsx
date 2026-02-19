@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "@/app/globals.css";
 import { ScrollToTopButton } from "@/components/scroll-to-top";
+import { getSiteUrl } from "@/ai/site-url";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: "Susinsight | Advancing Sustainability in Africa",
   description: "Susinsight homepage design imported from AI Studio."
 };

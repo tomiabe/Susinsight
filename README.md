@@ -79,6 +79,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/api/revalidate` on-demand cache revalidation for post/page/taxonomy/author updates
 - `/api/health` runtime health probe (includes WP GraphQL reachability when enabled)
 - `/robots.txt` generated robots policy
+- Story/page routes include canonical metadata and article structured data (JSON-LD)
 
 ### WordPress webhook for instant updates
 

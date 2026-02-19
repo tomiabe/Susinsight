@@ -1,12 +1,5 @@
 import { getRssFeedItems } from "@/ai/live-data";
-
-function resolveSiteUrl(): string {
-  const raw =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.SITE_URL ||
-    "https://susinsight.vercel.app";
-  return raw.endsWith("/") ? raw.slice(0, -1) : raw;
-}
+import { getSiteUrl } from "@/ai/site-url";
 
 function escapeXml(value: string): string {
   return value
@@ -25,7 +18,7 @@ function toRfc2822(date?: string): string | null {
 }
 
 export async function GET() {
-  const siteUrl = resolveSiteUrl();
+  const siteUrl = getSiteUrl();
   const items = await getRssFeedItems(60);
   const buildDate = new Date().toUTCString();
 

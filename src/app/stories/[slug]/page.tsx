@@ -13,6 +13,7 @@ import { ArticleExtras } from "@/components/article-extras";
 import { AD_SPOTS } from "@/ai/constants";
 import type { LiveHomeData } from "@/ai/live-types";
 import type { FooterColumn, NavItem } from "@/ai/types";
+import { absoluteUrl } from "@/ai/site-url";
 import {
   ArticleProgressBar,
   ArticleShareRail,
@@ -181,7 +182,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (params.slug === exampleArticle.slug) {
     return {
       title: `${exampleArticle.title} | Susinsight`,
-      description: exampleArticle.excerpt
+      description: exampleArticle.excerpt,
+      alternates: {
+        canonical: absoluteUrl(`/stories/${exampleArticle.slug}`)
+      },
+      openGraph: {
+        title: exampleArticle.title,
+        description: exampleArticle.excerpt,
+        type: "article",
+        url: absoluteUrl(`/stories/${exampleArticle.slug}`)
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: exampleArticle.title,
+        description: exampleArticle.excerpt
+      }
     };
   }
 
@@ -191,7 +206,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${stripHtml(post.title)} | Susinsight`,
-    description: stripHtml(post.excerpt)
+    description: stripHtml(post.excerpt),
+    alternates: {
+      canonical: absoluteUrl(`/stories/${post.slug}`)
+    },
+    openGraph: {
+      title: stripHtml(post.title),
+      description: stripHtml(post.excerpt),
+      type: "article",
+      url: absoluteUrl(`/stories/${post.slug}`),
+      images: post.featuredImage?.node?.sourceUrl
+        ? [
+            {
+              url: post.featuredImage.node.sourceUrl,
+              alt: post.featuredImage.node.altText || stripHtml(post.title)
+            }
+          ]
+        : undefined
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: stripHtml(post.title),
+      description: stripHtml(post.excerpt),
+      images: post.featuredImage?.node?.sourceUrl ? [post.featuredImage.node.sourceUrl] : undefined
+    }
   };
 }
 
@@ -395,6 +433,37 @@ export default async function StoryPage({ params }: PageProps) {
 
   const category = post.categories?.nodes?.[0]?.name || "Insightful Articles";
   let articles = await getPostsByCategory(category, 10);
+  const primaryImage =
+    post.featuredImage?.node?.sourceUrl ||
+    getFallbackImageSrc({
+      title: stripHtml(post.title),
+      category,
+      seed: 100
+    });
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: stripHtml(post.title),
+    description: stripHtml(post.excerpt),
+    datePublished: post.date,
+    dateModified: post.date,
+    image: [primaryImage],
+    mainEntityOfPage: absoluteUrl(`/stories/${post.slug}`),
+    author: [
+      {
+        "@type": "Person",
+        name: post.author?.node?.name || "Susinsight Staff",
+        url: absoluteUrl(
+          `/author/${post.author?.node?.slug || (post.author?.node?.name || "susinsight-staff").toLowerCase().replace(/\s+/g, "-")}`
+        )
+      }
+    ],
+    publisher: {
+      "@type": "Organization",
+      name: "Susinsight",
+      url: absoluteUrl("/")
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white text-brand-dark">
@@ -433,14 +502,7 @@ export default async function StoryPage({ params }: PageProps) {
               </div>
 
               <FeaturedImageWithCaption
-                src={
-                  post.featuredImage?.node?.sourceUrl ||
-                  getFallbackImageSrc({
-                    title: stripHtml(post.title),
-                    category,
-                    seed: 100
-                  })
-                }
+                src={primaryImage}
                 alt={post.featuredImage?.node?.altText || stripHtml(post.title)}
                 caption="Photo Collage/Illustration by Tomi Abe for SUSINSIGHT. Source: Unsplash"
               />
@@ -486,6 +548,10 @@ export default async function StoryPage({ params }: PageProps) {
           />
         </div>
       </main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
 
       <Footer footerLinks={navigation.footerLinks} />
     </div>
