@@ -238,7 +238,7 @@ export function SeriesCallout({ seriesName }: { seriesName: string }) {
   );
 }
 
-export function TagsSection({ tags, limit = 12 }: { tags: TaxonomyItem[]; limit?: number }) {
+export function TagsSection({ tags, limit = 11 }: { tags: TaxonomyItem[]; limit?: number }) {
   const [showAll, setShowAll] = useState(false);
   const displayTags = showAll ? tags : tags.slice(0, limit);
 
