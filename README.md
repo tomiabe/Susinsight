@@ -72,6 +72,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - Legacy WordPress date permalinks (`/YYYY/MM/DD/slug` and `/YYYY/MM/slug`) redirect to `/stories/slug`
 - `/feed` and `/rss` redirect to `/feed.xml`
 - `/wp-login.php` redirects to `/login`
+- Non-post pages now render with branded hero + right-rail actions while still using live WP page content
 - `/category/[slug]` live WordPress category archive
 - `/tag/[slug]` live WordPress tag archive
 - `/author/[slug]` live WordPress author archive
