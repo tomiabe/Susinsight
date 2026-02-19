@@ -320,13 +320,13 @@ export function CategoryGroup({ label, categories, showMoreThreshold = 0 }: { la
 
   return (
     <div className="flex flex-col md:flex-row md:items-baseline gap-x-4 gap-y-3 mb-6 last:mb-0">
-      <h4 className="font-heading text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400 whitespace-nowrap min-w-[100px]">{label}:</h4>
+      <h4 className="font-heading text-[12px] font-bold uppercase tracking-widest text-stone-500 whitespace-nowrap min-w-[100px]">{label}:</h4>
       <div className="flex flex-wrap gap-2 flex-1 items-center">
         {displayItems.map(cat => (
           <a
             key={cat.slug}
             href={`/category/${cat.slug}`}
-            className="px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50/50 text-[10px] font-body font-semibold text-stone-600 hover:bg-brand-light hover:border-brand-primary/30 hover:text-brand-primary transition-all"
+            className="px-4 py-1.5 rounded-full border border-stone-200 bg-stone-50/50 text-xs font-body font-semibold text-black hover:bg-brand-light hover:border-brand-primary/30 hover:text-brand-primary transition-all"
           >
             {cat.name}
           </a>
@@ -334,7 +334,7 @@ export function CategoryGroup({ label, categories, showMoreThreshold = 0 }: { la
         {showMoreThreshold > 0 && categories.length > showMoreThreshold && (
           <button
             onClick={() => setShowAll(!showAll)}
-            className="text-[10px] font-heading font-bold uppercase tracking-widest text-brand-primary/60 hover:text-brand-primary transition-colors ml-1"
+            className="text-[10px] font-heading font-bold uppercase tracking-widest text-stone-400 hover:text-brand-primary transition-colors ml-1"
           >
             {showAll ? "Show Less" : `+${categories.length - showMoreThreshold} More`}
           </button>
@@ -384,7 +384,7 @@ export function ArticleExtras({ authors, categories, tags, primaryCategoryName, 
       {/* Categories / Filed Under Section */}
       {secondaryCategories.length > 0 && (
         <div className="border-t border-stone-200 pt-12">
-          <p className="font-heading text-xs font-bold uppercase tracking-widest text-stone-400 mb-8 px-2">Filed Under</p>
+          <p className="font-heading text-[12px] uppercase tracking-widest text-stone-500 mb-4 px-2">Filed Under</p>
           <div className="space-y-6 px-2">
             <CategoryGroup label="Region" categories={grouped.Region} />
             <CategoryGroup label="Series" categories={grouped.Series} />
