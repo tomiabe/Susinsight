@@ -5,8 +5,24 @@ import { getNavigationData, getSearchResults } from "@/ai/live-data";
 type SearchPageProps = {
   searchParams?: {
     q?: string;
+    page?: string;
   };
 };
+
+const PAGE_SIZE = 12;
+
+function parsePage(input?: string): number {
+  const parsed = Number(input || "1");
+  if (!Number.isFinite(parsed) || parsed < 1) return 1;
+  return Math.floor(parsed);
+}
+
+function pageHref(page: number, query: string): string {
+  const qp = new URLSearchParams();
+  qp.set("q", query);
+  if (page > 1) qp.set("page", String(page));
+  return `/search?${qp.toString()}`;
+}
 
 export const metadata: Metadata = {
   title: "Search | Susinsight",
@@ -17,8 +33,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const query = (searchParams?.q || "").trim();
   const [navigation, results] = await Promise.all([
     getNavigationData(),
-    query ? getSearchResults(query, 30) : Promise.resolve([])
+    query ? getSearchResults(query, 120) : Promise.resolve([])
   ]);
+  const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
+  const requestedPage = parsePage(searchParams?.page);
+  const currentPage = Math.min(requestedPage, totalPages);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pagedResults = results.slice(start, start + PAGE_SIZE);
 
   return (
     <div className="min-h-screen bg-white text-brand-dark">
@@ -49,7 +70,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         )}
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-8">
-          {results.map((post) => (
+          {pagedResults.map((post) => (
             <article key={post.slug} className="border border-stone-100 rounded-xl overflow-hidden bg-white shadow-sm">
               {post.imageUrl ? (
                 <a href={post.link || "#"} className="block">
@@ -73,6 +94,30 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </article>
           ))}
         </div>
+
+        {query && totalPages > 1 ? (
+          <nav className="mt-4 mb-8 flex items-center justify-center gap-4 font-heading text-xs uppercase tracking-widest">
+            {currentPage > 1 ? (
+              <a href={pageHref(currentPage - 1, query)} className="px-4 py-2 border border-stone-200 rounded-lg hover:border-brand-primary hover:text-brand-primary transition-colors">
+                Previous
+              </a>
+            ) : (
+              <span className="px-4 py-2 border border-stone-100 rounded-lg text-stone-300">Previous</span>
+            )}
+
+            <span className="text-stone-500">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            {currentPage < totalPages ? (
+              <a href={pageHref(currentPage + 1, query)} className="px-4 py-2 border border-stone-200 rounded-lg hover:border-brand-primary hover:text-brand-primary transition-colors">
+                Next
+              </a>
+            ) : (
+              <span className="px-4 py-2 border border-stone-100 rounded-lg text-stone-300">Next</span>
+            )}
+          </nav>
+        ) : null}
       </main>
 
       <Footer footerLinks={navigation.footerLinks} />

@@ -7,11 +7,34 @@ export const metadata: Metadata = {
   description: "Latest stories from the Susinsight newsroom."
 };
 
-export default async function StoriesArchivePage() {
+type StoriesArchivePageProps = {
+  searchParams?: {
+    page?: string;
+  };
+};
+
+const PAGE_SIZE = 12;
+
+function parsePage(input?: string): number {
+  const parsed = Number(input || "1");
+  if (!Number.isFinite(parsed) || parsed < 1) return 1;
+  return Math.floor(parsed);
+}
+
+function pageHref(page: number): string {
+  return page <= 1 ? "/stories" : `/stories?page=${page}`;
+}
+
+export default async function StoriesArchivePage({ searchParams }: StoriesArchivePageProps) {
   const [navigation, stories] = await Promise.all([
     getNavigationData(),
-    getStoriesFeed(30)
+    getStoriesFeed(120)
   ]);
+  const totalPages = Math.max(1, Math.ceil(stories.length / PAGE_SIZE));
+  const requestedPage = parsePage(searchParams?.page);
+  const currentPage = Math.min(requestedPage, totalPages);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pagedStories = stories.slice(start, start + PAGE_SIZE);
 
   return (
     <div className="min-h-screen bg-white text-brand-dark">
@@ -30,7 +53,7 @@ export default async function StoriesArchivePage() {
 
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {stories.map((post) => (
+            {pagedStories.map((post) => (
               <article key={post.slug} className="border border-stone-100 rounded-xl overflow-hidden bg-white shadow-sm">
                 {post.imageUrl ? (
                   <a href={post.link || "#"} className="block">
@@ -54,6 +77,30 @@ export default async function StoriesArchivePage() {
               </article>
             ))}
           </div>
+
+          {totalPages > 1 ? (
+            <nav className="mt-12 flex items-center justify-center gap-4 font-heading text-xs uppercase tracking-widest">
+              {currentPage > 1 ? (
+                <a href={pageHref(currentPage - 1)} className="px-4 py-2 border border-stone-200 rounded-lg hover:border-brand-primary hover:text-brand-primary transition-colors">
+                  Previous
+                </a>
+              ) : (
+                <span className="px-4 py-2 border border-stone-100 rounded-lg text-stone-300">Previous</span>
+              )}
+
+              <span className="text-stone-500">
+                Page {currentPage} of {totalPages}
+              </span>
+
+              {currentPage < totalPages ? (
+                <a href={pageHref(currentPage + 1)} className="px-4 py-2 border border-stone-200 rounded-lg hover:border-brand-primary hover:text-brand-primary transition-colors">
+                  Next
+                </a>
+              ) : (
+                <span className="px-4 py-2 border border-stone-100 rounded-lg text-stone-300">Next</span>
+              )}
+            </nav>
+          ) : null}
         </section>
       </main>
 

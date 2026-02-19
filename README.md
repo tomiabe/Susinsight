@@ -69,6 +69,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/tag/[slug]` live WordPress tag archive
 - `/author/[slug]` live WordPress author archive
 - `/search?q=term` live WordPress post search
+- `?page=2` pagination supported on stories/category/tag/author/search archives
 - `/sitemap.xml` generated from WordPress posts/pages/taxonomies/authors
 - `/feed.xml` live RSS feed generated from WordPress posts
 - `/api/draft?secret=...&slug=...` enable draft mode and open a story preview

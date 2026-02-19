@@ -7,7 +7,18 @@ type TagPageProps = {
   params: {
     slug: string;
   };
+  searchParams?: {
+    page?: string;
+  };
 };
+
+const PAGE_SIZE = 12;
+
+function parsePage(input?: string): number {
+  const parsed = Number(input || "1");
+  if (!Number.isFinite(parsed) || parsed < 1) return 1;
+  return Math.floor(parsed);
+}
 
 function stripHtml(html: string | null | undefined): string {
   if (!html) return "";
@@ -24,13 +35,20 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
   };
 }
 
-export default async function TagPage({ params }: TagPageProps) {
+export default async function TagPage({ params, searchParams }: TagPageProps) {
   const [archive, navigation] = await Promise.all([
     getTagArchive(params.slug),
     getNavigationData()
   ]);
 
   if (!archive) return notFound();
+  const totalPages = Math.max(1, Math.ceil(archive.posts.length / PAGE_SIZE));
+  const requestedPage = parsePage(searchParams?.page);
+  const currentPage = Math.min(requestedPage, totalPages);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const posts = archive.posts.slice(start, start + PAGE_SIZE);
+  const pageHref = (page: number) =>
+    page <= 1 ? `/tag/${params.slug}` : `/tag/${params.slug}?page=${page}`;
 
   return (
     <div className="min-h-screen bg-white text-brand-dark">
@@ -51,7 +69,7 @@ export default async function TagPage({ params }: TagPageProps) {
 
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {archive.posts.map((post) => (
+            {posts.map((post) => (
               <article key={post.slug} className="border border-stone-100 rounded-xl overflow-hidden bg-white shadow-sm">
                 {post.imageUrl ? (
                   <a href={post.link || "#"} className="block">
@@ -75,6 +93,30 @@ export default async function TagPage({ params }: TagPageProps) {
               </article>
             ))}
           </div>
+
+          {totalPages > 1 ? (
+            <nav className="mt-12 flex items-center justify-center gap-4 font-heading text-xs uppercase tracking-widest">
+              {currentPage > 1 ? (
+                <a href={pageHref(currentPage - 1)} className="px-4 py-2 border border-stone-200 rounded-lg hover:border-brand-primary hover:text-brand-primary transition-colors">
+                  Previous
+                </a>
+              ) : (
+                <span className="px-4 py-2 border border-stone-100 rounded-lg text-stone-300">Previous</span>
+              )}
+
+              <span className="text-stone-500">
+                Page {currentPage} of {totalPages}
+              </span>
+
+              {currentPage < totalPages ? (
+                <a href={pageHref(currentPage + 1)} className="px-4 py-2 border border-stone-200 rounded-lg hover:border-brand-primary hover:text-brand-primary transition-colors">
+                  Next
+                </a>
+              ) : (
+                <span className="px-4 py-2 border border-stone-100 rounded-lg text-stone-300">Next</span>
+              )}
+            </nav>
+          ) : null}
         </section>
       </main>
 
