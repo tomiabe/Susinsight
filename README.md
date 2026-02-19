@@ -32,6 +32,19 @@ WP_PREVIEW_TOKEN=
 Set `USE_WORDPRESS_CONTENT=false` to run pure AI Studio static mode (no WP dependency).
 Set `USE_WORDPRESS_CONTENT=true` to use live WordPress content via WPGraphQL.
 
+### WordPress plugins required
+
+- `WPGraphQL`
+- `Advanced Custom Fields` (optional but recommended)
+- `WPGraphQL for ACF` (if using ACF fields)
+
+### WordPress backend setup checklist
+
+- Confirm GraphQL works at `https://your-site.com/graphql`
+- Ensure posts are published with slugs for `/stories/[slug]`
+- Create standard WP Pages for routes like `/about`, `/contact`, `/advertise`, etc.
+- Keep page slugs clean because frontend URI matching uses WP page URI
+
 ## Run locally
 
 ```bash
@@ -46,6 +59,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - `/` AI Studio homepage with live WP data injected into hero/trending/signals/main sections
 - `/stories/[slug]` live WordPress article page
+- `/<page-slug>` live WordPress Page route (catch-all for non-post pages)
 - `/api/draft?secret=...&slug=...` enable draft mode and open a story preview
 - `/api/exit-draft` disable draft mode
 

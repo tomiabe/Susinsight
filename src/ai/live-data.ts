@@ -61,6 +61,23 @@ type WpPostNode = {
   } | null;
 };
 
+export type WpPageNode = {
+  id: string;
+  slug: string;
+  uri?: string | null;
+  title: string;
+  content?: string | null;
+  excerpt?: string | null;
+  date?: string | null;
+  modified?: string | null;
+  featuredImage?: {
+    node?: {
+      sourceUrl?: string | null;
+      altText?: string | null;
+    } | null;
+  } | null;
+};
+
 const endpoint = process.env.WORDPRESS_GRAPHQL_URL;
 const headlessKey = process.env.HEADLESS_FETCH_KEY;
 const useWordPressContent = process.env.USE_WORDPRESS_CONTENT === "true";
@@ -501,4 +518,37 @@ export async function getPostsByCategory(categoryName: string, count: number = 1
 
   // Fallback to latest posts if no category match
   return (data?.latest?.nodes || []).map(toArticle);
+}
+
+export async function getPageByUri(uri: string, options?: { preview?: boolean }): Promise<WpPageNode | null> {
+  const normalized = uri.startsWith("/") ? uri : `/${uri}`;
+  const withTrailingSlash = normalized.endsWith("/") ? normalized : `${normalized}/`;
+
+  const query = /* GraphQL */ `
+    query PageByUri($uri: ID!, $asPreview: Boolean!) {
+      page(id: $uri, idType: URI, asPreview: $asPreview) {
+        id
+        slug
+        uri
+        title
+        content
+        excerpt
+        date
+        modified
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{ page?: WpPageNode | null }>(
+    query,
+    { uri: withTrailingSlash, asPreview: Boolean(options?.preview) },
+    options
+  );
+  return data?.page || null;
 }
