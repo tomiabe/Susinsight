@@ -46,15 +46,25 @@ export async function GET() {
 
   const status: HealthStatus =
     useWordPress && wpUrl && !wpReachable ? "degraded" : "ok";
+  const commitSha = process.env.VERCEL_GIT_COMMIT_SHA || process.env.GIT_COMMIT_SHA || null;
+  const vercelUrl = process.env.VERCEL_URL || null;
 
   return NextResponse.json(
     {
       status,
       timestamp: new Date().toISOString(),
       uptimeSeconds: Math.floor(process.uptime()),
+      version: {
+        commitSha,
+        node: process.version,
+        env: process.env.NODE_ENV || "development"
+      },
       mode: {
         useWordPressContent: useWordPress,
         hasWordPressUrl: Boolean(wpUrl)
+      },
+      deployment: {
+        vercelUrl
       },
       services: {
         wordpressGraphql: {

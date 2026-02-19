@@ -81,6 +81,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/api/exit-draft` disable draft mode
 - `/api/revalidate` on-demand cache revalidation for post/page/taxonomy/author updates
 - `/api/health` runtime health probe (includes WP GraphQL reachability when enabled)
+- `/humans.txt` plain-text project descriptor
 - `/robots.txt` generated robots policy
 - Story/page routes include canonical metadata and article structured data (JSON-LD)
 - Archive/search routes include canonical and Open Graph metadata
