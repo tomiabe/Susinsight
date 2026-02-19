@@ -253,7 +253,10 @@ async function ExampleArticlePage() {
           <div className="grid lg:grid-cols-[60px_1fr_280px] gap-8 xl:gap-12 items-start">
             <div className="hidden lg:flex sticky top-28 flex-col items-center gap-8">
               <ArticleShareRail title={exampleArticle.title} />
-              <ArticleClap />
+              <div className="flex flex-col items-center gap-3">
+                <span className="font-heading text-[10px] font-bold uppercase tracking-widest text-stone-400">Clap</span>
+                <ArticleClap />
+              </div>
             </div>
 
             <article>
@@ -370,7 +373,10 @@ export default async function StoryPage({ params }: PageProps) {
           <div className="grid lg:grid-cols-[60px_1fr_280px] gap-8 xl:gap-12 items-start">
             <div className="hidden lg:flex sticky top-28 flex-col items-center gap-8">
               <ArticleShareRail title={stripHtml(post.title)} />
-              <ArticleClap />
+              <div className="flex flex-col items-center gap-3">
+                <span className="font-heading text-[10px] font-bold uppercase tracking-widest text-stone-400">Clap</span>
+                <ArticleClap />
+              </div>
             </div>
 
             <article>
