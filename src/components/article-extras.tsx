@@ -246,14 +246,16 @@ export function TagsSection({ tags }: { tags: TaxonomyItem[] }) {
   useEffect(() => {
     const checkOverflow = () => {
       if (containerRef.current) {
-        setIsOverflowing(containerRef.current.scrollHeight > containerRef.current.clientHeight);
+        // We check against the collapsed height threshold (72px) 
+        // to see if we ever need a "Show More" button.
+        setIsOverflowing(containerRef.current.scrollHeight > 72);
       }
     };
 
     checkOverflow();
     window.addEventListener('resize', checkOverflow);
     return () => window.removeEventListener('resize', checkOverflow);
-  }, [tags]);
+  }, [tags, showAll]);
 
   if (tags.length === 0) return null;
 
