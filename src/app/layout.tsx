@@ -9,6 +9,43 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const tailwindConfig = `
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['"Bricolage Grotesque"', 'sans-serif'],
+            serif: ['"Manrope"', 'sans-serif'],
+            display: ['"Bricolage Grotesque"', 'sans-serif'],
+            body: ['"Manrope"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              light: '#F9FFE3',
+              primary: '#3A8B72',
+              dark: '#2E6F5B',
+              soft: '#91C3B3',
+              muted: '#78716c',
+            }
+          },
+          animation: { marquee: 'marquee 60s linear infinite' },
+          keyframes: {
+            marquee: {
+              '0%': { transform: 'translateX(0)' },
+              '100%': { transform: 'translateX(-50%)' },
+            }
+          }
+        }
+      },
+      plugins: [
+        function({ addUtilities }) {
+          addUtilities({ '.paused': { 'animation-play-state': 'paused' } })
+        }
+      ]
+    };
+  `;
+
   return (
     <html lang="en">
       <head>
@@ -22,62 +59,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
         <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
 
-        {/* Tailwind config MUST be defined before the CDN script loads to avoid FOUC on refresh */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-      window.tailwind = window.tailwind || {};
-      window.tailwind_config_pending = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              heading: ['"Bricolage Grotesque"', 'sans-serif'],
-              serif: ['"Manrope"', 'sans-serif'],
-              display: ['"Bricolage Grotesque"', 'sans-serif'],
-              body: ['"Manrope"', 'sans-serif'],
-            },
-            colors: {
-              brand: {
-                light: '#F9FFE3',
-                primary: '#3A8B72',
-                dark: '#2E6F5B',
-                soft: '#91C3B3',
-                muted: '#78716c',
-              }
-            },
-            animation: {
-              marquee: 'marquee 60s linear infinite',
-            },
-            keyframes: {
-              marquee: {
-                '0%': { transform: 'translateX(0)' },
-                '100%': { transform: 'translateX(-50%)' },
-              }
-            }
-          }
-        },
-        plugins: [
-          function({ addUtilities }) {
-            addUtilities({
-              '.paused': { 'animation-play-state': 'paused' }
-            })
-          }
-        ]
-      };
-            `
-          }}
-        />
+        {/* Tailwind CDN — config is applied immediately after CDN script executes */}
         <script src="https://cdn.tailwindcss.com"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-      if (window.tailwind && window.tailwind_config_pending) {
-        tailwind.config = window.tailwind_config_pending;
-      }
-            `
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: tailwindConfig }} />
       </head>
       <body>
         <div id="google_translate_element" />

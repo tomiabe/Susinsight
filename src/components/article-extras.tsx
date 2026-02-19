@@ -224,6 +224,7 @@ export function ArticleAudioPlayer() {
   }, [selectedVoiceName]);
 
   const getLanguage = () => {
+    if (typeof window === 'undefined') return 'en';
     const langAttr = document.documentElement.lang;
     return langAttr || 'en';
   };
@@ -318,7 +319,7 @@ export function ArticleAudioPlayer() {
     }
   };
 
-  const currentLang = getLanguage().split('-')[0];
+  const currentLang = typeof window !== 'undefined' ? getLanguage().split('-')[0] : 'en';
   const filteredVoices = voices.filter(v => v.lang.startsWith(currentLang));
 
   return (
