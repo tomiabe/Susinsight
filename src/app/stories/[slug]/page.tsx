@@ -423,7 +423,7 @@ export default async function StoryPage({ params }: PageProps) {
 
               <div className="font-heading text-xs uppercase tracking-widest text-stone-500 mb-6 flex gap-3">
                 <a
-                  href={`/author/${(post.author?.node?.name || "Susinsight Staff").toLowerCase().replace(/\s+/g, '-')}`}
+                  href={`/author/${post.author?.node?.slug || (post.author?.node?.name || "Susinsight Staff").toLowerCase().replace(/\s+/g, '-')}`}
                   className="hover:underline hover:text-brand-primary transition-colors"
                 >
                   {post.author?.node?.name || "Susinsight Staff"}

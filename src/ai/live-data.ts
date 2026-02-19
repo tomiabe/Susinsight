@@ -29,6 +29,7 @@ type WpPostNode = {
   author?: {
     node?: {
       name?: string | null;
+      slug?: string | null;
       description?: string | null;
       avatar?: {
         url?: string | null;
@@ -138,6 +139,7 @@ function toArticle(post: WpPostNode): Article {
   return {
     title: stripHtml(post.title),
     author: post.author?.node?.name || "Susinsight Staff",
+    authorSlug: post.author?.node?.slug || undefined,
     authorAvatar: post.author?.node?.avatar?.url || undefined,
     authorBio: post.author?.node?.description || undefined,
     excerpt: stripHtml(post.excerpt) || "Read the full story on Susinsight.",
@@ -255,6 +257,7 @@ export async function getLiveHomeData(options?: { preview?: boolean }): Promise<
           author {
             node {
               name
+              slug
             }
           }
           featuredImage {
@@ -390,6 +393,7 @@ export async function getStoryBySlug(slug: string, options?: { preview?: boolean
         author {
           node {
             name
+            slug
             description
             avatar {
               url
@@ -447,6 +451,7 @@ export async function getStoryById(id: number, options?: { preview?: boolean }):
         author {
           node {
             name
+            slug
             description
             avatar {
               url
@@ -490,6 +495,7 @@ export async function getPostsByCategory(categoryName: string, count: number = 1
           author {
             node {
               name
+              slug
             }
           }
           featuredImage {
@@ -516,6 +522,7 @@ export async function getPostsByCategory(categoryName: string, count: number = 1
           author {
             node {
               name
+              slug
             }
           }
           featuredImage {
@@ -725,6 +732,7 @@ export async function getCategoryArchive(slug: string): Promise<{
             author {
               node {
                 name
+                slug
               }
             }
             featuredImage {
@@ -787,6 +795,7 @@ export async function getTagArchive(slug: string): Promise<{
             author {
               node {
                 name
+                slug
               }
             }
             featuredImage {
@@ -825,4 +834,114 @@ export async function getTagArchive(slug: string): Promise<{
     description: tag.description || null,
     posts: (tag.posts?.nodes || []).map(toArticle)
   };
+}
+
+export async function getAuthorArchive(slug: string): Promise<{
+  name: string;
+  slug: string;
+  description?: string | null;
+  avatarUrl?: string | null;
+  posts: Article[];
+} | null> {
+  const query = /* GraphQL */ `
+    query AuthorArchive($slug: ID!) {
+      user(id: $slug, idType: SLUG) {
+        name
+        slug
+        description
+        avatar {
+          url
+        }
+        posts(first: 24, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+          nodes {
+            id
+            slug
+            title
+            excerpt
+            date
+            author {
+              node {
+                name
+                slug
+              }
+            }
+            featuredImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+            categories {
+              nodes {
+                name
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{
+    user?: {
+      name?: string | null;
+      slug?: string | null;
+      description?: string | null;
+      avatar?: { url?: string | null } | null;
+      posts?: { nodes: WpPostNode[] } | null;
+    } | null;
+  }>(query, { slug });
+
+  const author = data?.user;
+  if (!author?.slug || !author?.name) return null;
+
+  return {
+    name: author.name,
+    slug: author.slug,
+    description: author.description || null,
+    avatarUrl: author.avatar?.url || null,
+    posts: (author.posts?.nodes || []).map(toArticle)
+  };
+}
+
+export async function getSearchResults(term: string, count: number = 24): Promise<Article[]> {
+  const query = /* GraphQL */ `
+    query SearchPosts($search: String, $count: Int!) {
+      posts(first: $count, where: { search: $search, status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          id
+          slug
+          title
+          excerpt
+          date
+          author {
+            node {
+              name
+              slug
+            }
+          }
+          featuredImage {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+          categories {
+            nodes {
+              name
+              slug
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{ posts?: { nodes: WpPostNode[] } }>(
+    query,
+    { search: term, count }
+  );
+
+  return (data?.posts?.nodes || []).map(toArticle);
 }

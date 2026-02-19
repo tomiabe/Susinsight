@@ -64,6 +64,8 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/<page-slug>` live WordPress Page route (catch-all for non-post pages)
 - `/category/[slug]` live WordPress category archive
 - `/tag/[slug]` live WordPress tag archive
+- `/author/[slug]` live WordPress author archive
+- `/search?q=term` live WordPress post search
 - `/api/draft?secret=...&slug=...` enable draft mode and open a story preview
 - `/api/draft?secret=...&type=page&slug=/about/` enable draft mode and open a page preview
 - `/api/draft?secret=...&type=page&id=<wp-page-id>` preview a WP page by database ID
