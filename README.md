@@ -76,6 +76,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/api/draft?secret=...&type=page&id=<wp-page-id>` preview a WP page by database ID
 - `/api/exit-draft` disable draft mode
 - `/api/revalidate` on-demand cache revalidation for post/page/taxonomy/author updates
+- `/api/health` runtime health probe (includes WP GraphQL reachability when enabled)
 - `/robots.txt` generated robots policy
 
 ### WordPress webhook for instant updates
