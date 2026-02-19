@@ -18,11 +18,11 @@ export const NAV_STRUCTURE: NavItem[] = [
     label: "Signals",
     href: "#",
     children: [
-        { label: "Career Compass", href: "https://susinsight.com/career-compass/" },
-        { label: "Founder Playbook", href: "https://susinsight.com/founder-playbook/" },
-        { label: "Ground Truth", href: "https://susinsight.com/ground-truth/" },
-        { label: "Market Watch", href: "https://susinsight.com/market-watch/" },
-        { label: "Policy in Practice", href: "https://susinsight.com/policy-practice/" },
+      { label: "Career Compass", href: "https://susinsight.com/career-compass/" },
+      { label: "Founder Playbook", href: "https://susinsight.com/founder-playbook/" },
+      { label: "Ground Truth", href: "https://susinsight.com/ground-truth/" },
+      { label: "Market Watch", href: "https://susinsight.com/market-watch/" },
+      { label: "Policy in Practice", href: "https://susinsight.com/policy-practice/" },
     ]
   },
   {
@@ -49,56 +49,56 @@ export const NAV_STRUCTURE: NavItem[] = [
     label: "Series",
     href: "#",
     children: [
-        { label: "All Series", href: "https://susinsight.com/series/" },
-        { label: "Beyond the Torch", href: "https://susinsight.com/beyond-the-torch/" },
-        { label: "Crisis & Recovery", href: "https://susinsight.com/crisis-and-recovery/" },
-        { label: "Critical Lifelines", href: "https://susinsight.com/critical-lifelines/" },
-        { label: "Echoes of History", href: "https://susinsight.com/echoes-of-history/" },
-        { label: "Food for Thought", href: "https://susinsight.com/food-for-thought/" },
-        { label: "Green Games", href: "https://susinsight.com/green-games/" },
-        { label: "Laws of Change", href: "https://susinsight.com/laws-of-change/" },
-        { label: "Legacy in Motion", href: "https://susinsight.com/legacy-in-motion/" },
-        { label: "Roots & Rituals", href: "https://susinsight.com/roots-and-rituals/" },
+      { label: "All Series", href: "https://susinsight.com/series/" },
+      { label: "Beyond the Torch", href: "https://susinsight.com/beyond-the-torch/" },
+      { label: "Crisis & Recovery", href: "https://susinsight.com/crisis-and-recovery/" },
+      { label: "Critical Lifelines", href: "https://susinsight.com/critical-lifelines/" },
+      { label: "Echoes of History", href: "https://susinsight.com/echoes-of-history/" },
+      { label: "Food for Thought", href: "https://susinsight.com/food-for-thought/" },
+      { label: "Green Games", href: "https://susinsight.com/green-games/" },
+      { label: "Laws of Change", href: "https://susinsight.com/laws-of-change/" },
+      { label: "Legacy in Motion", href: "https://susinsight.com/legacy-in-motion/" },
+      { label: "Roots & Rituals", href: "https://susinsight.com/roots-and-rituals/" },
     ]
   },
   {
     label: "Data",
     href: "#",
     children: [
-        { label: "Susdata", href: "https://susinsight.com/data/" },
-        { label: "Look at the Data", href: "https://susinsight.com/look-data/" },
+      { label: "Susdata", href: "https://susinsight.com/data/" },
+      { label: "Look at the Data", href: "https://susinsight.com/look-data/" },
     ]
   },
   {
     label: "Resources",
     href: "#",
     children: [
-        { label: "Glossary", href: "https://susinsight.com/resources/glossary/" },
-        { label: "Historical Milestones", href: "https://susinsight.com/?page_id=3083" },
-        { label: "Independence Dates", href: "https://susinsight.com/resources/independence/" },
-        { label: "World Days", href: "https://susinsight.com/resources/world-days/" },
+      { label: "Glossary", href: "https://susinsight.com/resources/glossary/" },
+      { label: "Historical Milestones", href: "https://susinsight.com/?page_id=3083" },
+      { label: "Independence Dates", href: "https://susinsight.com/resources/independence/" },
+      { label: "World Days", href: "https://susinsight.com/resources/world-days/" },
     ]
   },
   {
     label: "Info",
     href: "#",
     children: [
-        { label: "About Us", href: "https://susinsight.com/about/" },
-        { label: "Our Vision", href: "https://susinsight.com/vision/" },
-        { label: "Our Philosophy", href: "https://susinsight.com/philosophy/" },
-        { label: "The Founders", href: "https://susinsight.com/the-founders/" },
-        { label: "Partner With Us", href: "https://susinsight.com/partner/" },
-        { label: "Amplify your Impact", href: "https://susinsight.com/amplify/" },
-        { label: "Be in the Spotlight", href: "https://susinsight.com/spotlight/" },
+      { label: "About Us", href: "https://susinsight.com/about/" },
+      { label: "Our Vision", href: "https://susinsight.com/vision/" },
+      { label: "Our Philosophy", href: "https://susinsight.com/philosophy/" },
+      { label: "The Founders", href: "https://susinsight.com/the-founders/" },
+      { label: "Partner With Us", href: "https://susinsight.com/partner/" },
+      { label: "Amplify your Impact", href: "https://susinsight.com/amplify/" },
+      { label: "Be in the Spotlight", href: "https://susinsight.com/spotlight/" },
     ]
   },
   {
     label: "Contribute",
     href: "#",
     children: [
-        { label: "Become a Contributor", href: "https://susinsight.com/contribute/" },
-        { label: "Share Your Story", href: "https://susinsight.com/share/" },
-        { label: "Our Contributors", href: "https://susinsight.com/contributors/" },
+      { label: "Become a Contributor", href: "https://susinsight.com/contribute/" },
+      { label: "Share Your Story", href: "https://susinsight.com/share/" },
+      { label: "Our Contributors", href: "https://susinsight.com/contributors/" },
     ]
   },
   {
@@ -109,8 +109,8 @@ export const NAV_STRUCTURE: NavItem[] = [
     label: "Account",
     href: "#",
     children: [
-        { label: "Log Out", href: "https://susinsight.com/wp-login.php?action=logout" },
-        { label: "My Account", href: "https://susinsight.com/account/" },
+      { label: "Log Out", href: "https://susinsight.com/wp-login.php?action=logout" },
+      { label: "My Account", href: "https://susinsight.com/account/" },
     ]
   }
 ];
@@ -171,59 +171,59 @@ export const SIGNALS_PREVIEW: SectionData = {
 };
 
 export const SUSDATA_SECTION = {
-    title: "Look at the data.",
-    subtitle: "De-bunking myths with raw numbers and clear visualizations.",
-    visualizationImageSeed: 888,
-    articles: [
-        {
-            title: "Renewable Energy Capacity vs. Grid Reliability in West Africa (2020-2025)",
-            excerpt: "Visualizing the correlation between decentralised solar adoption and reduction in grid downtime hours.",
-            category: "Energy"
-        },
-        {
-            title: "The Real Cost of Fast Fashion Imports",
-            excerpt: "Data breakdown of volume (tonnes) versus economic value created in local textile markets.",
-            category: "Trade"
-        }
-    ]
+  title: "Look at the data.",
+  subtitle: "De-bunking myths with raw numbers and clear visualizations.",
+  visualizationImageSeed: 888,
+  articles: [
+    {
+      title: "Renewable Energy Capacity vs. Grid Reliability in West Africa (2020-2025)",
+      excerpt: "Visualizing the correlation between decentralised solar adoption and reduction in grid downtime hours.",
+      category: "Energy"
+    },
+    {
+      title: "The Real Cost of Fast Fashion Imports",
+      excerpt: "Data breakdown of volume (tonnes) versus economic value created in local textile markets.",
+      category: "Trade"
+    }
+  ]
 };
 
 export const SPECIAL_PROJECT = {
-    title: "The 2025 Outlook Report",
-    subtitle: "A comprehensive deep-dive into the trends that will define African sustainability this year.",
-    cta: "Read the Report",
-    imageSeed: 777
+  title: "The 2025 Outlook Report",
+  subtitle: "A comprehensive deep-dive into the trends that will define African sustainability this year.",
+  cta: "Read the Report",
+  imageSeed: 777
 };
 
 export const AD_SPOTS = [
-    {
-        title: "Ethical Fashion Week 2025",
-        subtitle: "Join the movement redefining style in Accra.",
-        cta: "Get Tickets",
-        imageSeed: 101,
-        sponsor: "Partner Spotlight"
-    },
-    {
-        title: "Green Tech Summit",
-        subtitle: "Where innovation meets investment. Nairobi, June 2025.",
-        cta: "Register Now",
-        imageSeed: 102,
-        sponsor: "Partner Spotlight"
-    },
-    {
-        title: "Sustainable Agriculture Fund",
-        subtitle: "Empowering smallholder farmers with climate-resilient seeds.",
-        cta: "Learn More",
-        imageSeed: 103,
-        sponsor: "Initiative Focus"
-    }
+  {
+    title: "Ethical Fashion Week 2025",
+    subtitle: "Join the movement redefining style in Accra.",
+    cta: "Get Tickets",
+    imageSeed: 101,
+    sponsor: "Partner Spotlight"
+  },
+  {
+    title: "Green Tech Summit",
+    subtitle: "Where innovation meets investment. Nairobi, June 2025.",
+    cta: "Register Now",
+    imageSeed: 102,
+    sponsor: "Partner Spotlight"
+  },
+  {
+    title: "Sustainable Agriculture Fund",
+    subtitle: "Empowering smallholder farmers with climate-resilient seeds.",
+    cta: "Learn More",
+    imageSeed: 103,
+    sponsor: "Initiative Focus"
+  }
 ];
 
 export const SOCIAL_FEED = [
-    { platform: 'instagram', link: 'https://instagram.com/susinsight', seed: 201 },
-    { platform: 'instagram', link: 'https://instagram.com/susinsight', seed: 202 },
-    { platform: 'pinterest', link: '#', seed: 203 },
-    { platform: 'flipboard', link: '#', seed: 204 },
+  { platform: 'instagram', link: 'https://instagram.com/susinsight', seed: 201 },
+  { platform: 'instagram', link: 'https://instagram.com/susinsight', seed: 202 },
+  { platform: 'pinterest', link: '#', seed: 203 },
+  { platform: 'flipboard', link: '#', seed: 204 },
 ];
 
 export const CONTENT_SECTIONS: SectionData[] = [
@@ -254,7 +254,8 @@ export const CONTENT_SECTIONS: SectionData[] = [
         title: "How Invisible Networks Are Powering the Next Economic Leap",
         author: "Adetumilara Adetayo",
         excerpt: "Fiber cables and cloud servers don’t get much attention, but they’re changing lives—from smart farms in Uganda to online classrooms in Nigeria.",
-        category: "Technology"
+        category: "Technology",
+        link: "/stories/how-invisible-networks-are-powering-the-next-economic-leap"
       },
       {
         title: "Beyond the Grid: How Pay-As-You-Go Solar is Redefining Ownership in Rural Zambia",
@@ -391,48 +392,48 @@ export const UNEXPECTED_IMPACT: SectionData = {
 };
 
 export const FICTIONAL_STORIES: SectionData = {
-    id: 'fictional-stories',
-    title: "Fictional Stories",
-    subtitle: "Fiction that inspires reflection and action on real-world issues.",
-    articles: [
-        {
-            title: "The Silent Echoes",
-            excerpt: "How can shared stories and open conversations help heal unseen wounds and bring hope to those suffering in silence?"
-        },
-        {
-            title: "The Guardians of Gaia",
-            excerpt: "What happens when a small African village, guided by the wisdom of its elders, harnesses the power of the sun to defend its land?"
-        },
-        {
-            title: "The Rebirth of Lake Lumo",
-            excerpt: "In a battle against despair, a village discovers the strength of innovation and community to restore their cherished lake."
-        }
-    ],
-    ctaText: "View All Stories"
-  }
+  id: 'fictional-stories',
+  title: "Fictional Stories",
+  subtitle: "Fiction that inspires reflection and action on real-world issues.",
+  articles: [
+    {
+      title: "The Silent Echoes",
+      excerpt: "How can shared stories and open conversations help heal unseen wounds and bring hope to those suffering in silence?"
+    },
+    {
+      title: "The Guardians of Gaia",
+      excerpt: "What happens when a small African village, guided by the wisdom of its elders, harnesses the power of the sun to defend its land?"
+    },
+    {
+      title: "The Rebirth of Lake Lumo",
+      excerpt: "In a battle against despair, a village discovers the strength of innovation and community to restore their cherished lake."
+    }
+  ],
+  ctaText: "View All Stories"
+}
 
 export const IMPACT_STORIES: SectionData = {
-    id: 'impact-stories',
-    title: "Impact Stories",
-    subtitle: "Explore how companies across Africa are building profit with purpose.",
-    articles: [
-        {
-            title: "Brewing a Better World: The Nigerian Breweries Impact Story",
-            author: "Adetoro Adetayo",
-            excerpt: "Nigerian Breweries is making a big difference by helping communities, protecting the environment, and promoting responsible drinking."
-        },
-        {
-            title: "Why Capricorn Group Thinks Social Impact is Good Business",
-            author: "Adetoro Adetayo",
-            excerpt: "Capricorn Group believes investing in education and local communities isn’t just charity—it’s a smart strategy for lasting change."
-        },
-        {
-            title: "The Circular Loop: How a Nairobi Startup is Turning Plastic Waste into School Desks",
-            author: "Gloria Edukere",
-            excerpt: "Instead of clogging landfills, Nairobi's waste is being transformed into high-durability furniture, solving both an environmental and educational crisis.",
-        }
-    ],
-    ctaText: "Amplify your impact »"
+  id: 'impact-stories',
+  title: "Impact Stories",
+  subtitle: "Explore how companies across Africa are building profit with purpose.",
+  articles: [
+    {
+      title: "Brewing a Better World: The Nigerian Breweries Impact Story",
+      author: "Adetoro Adetayo",
+      excerpt: "Nigerian Breweries is making a big difference by helping communities, protecting the environment, and promoting responsible drinking."
+    },
+    {
+      title: "Why Capricorn Group Thinks Social Impact is Good Business",
+      author: "Adetoro Adetayo",
+      excerpt: "Capricorn Group believes investing in education and local communities isn’t just charity—it’s a smart strategy for lasting change."
+    },
+    {
+      title: "The Circular Loop: How a Nairobi Startup is Turning Plastic Waste into School Desks",
+      author: "Gloria Edukere",
+      excerpt: "Instead of clogging landfills, Nairobi's waste is being transformed into high-durability furniture, solving both an environmental and educational crisis.",
+    }
+  ],
+  ctaText: "Amplify your impact »"
 }
 
 
@@ -466,9 +467,9 @@ export const LOWER_SECTIONS: SectionData[] = [
     subtitle: "Highlights and insights from forums shaping our shared future.",
     articles: [
       {
-         title: "COP30 Showed Why Africa Must Lead the Next Phase of Climate Action",
-         author: "Adetoro Adetayo",
-         excerpt: "The continent isn’t asking for charity; it’s building energy systems, financing models, and industries that could shape the global green economy.",
+        title: "COP30 Showed Why Africa Must Lead the Next Phase of Climate Action",
+        author: "Adetoro Adetayo",
+        excerpt: "The continent isn’t asking for charity; it’s building energy systems, financing models, and industries that could shape the global green economy.",
       },
       {
         title: "Africa Is Tired of Promises. It Wants Power Over Its Climate Future.",
@@ -503,7 +504,7 @@ export const LOWER_SECTIONS: SectionData[] = [
     ],
     ctaText: "View All Opinions"
   },
-   {
+  {
     id: 'policy-reviews',
     title: "Policy Reviews",
     subtitle: "Clear, critical looks at the decisions shaping Africa’s development.",
@@ -603,8 +604,8 @@ export const FOOTER_LINKS: FooterColumn[] = [
 ];
 
 export const EXPLORE_SERIES = [
-    { title: "Crisis and Recovery", desc: "How do economic and environmental disasters shape recovery efforts?", imageSeed: 501 },
-    { title: "Food for Thought", desc: "Can African food systems support long-term sustainability and food security?", imageSeed: 502 },
-    { title: "Seasons of Growth", desc: "What challenges do farmers face in maintaining sustainable harvest seasons?", imageSeed: 503 },
-    { title: "Sustainable by Design", desc: "How do cultural values influence sustainable architecture in African homes?", imageSeed: 504 },
+  { title: "Crisis and Recovery", desc: "How do economic and environmental disasters shape recovery efforts?", imageSeed: 501 },
+  { title: "Food for Thought", desc: "Can African food systems support long-term sustainability and food security?", imageSeed: 502 },
+  { title: "Seasons of Growth", desc: "What challenges do farmers face in maintaining sustainable harvest seasons?", imageSeed: 503 },
+  { title: "Sustainable by Design", desc: "How do cultural values influence sustainable architecture in African homes?", imageSeed: 504 },
 ];
