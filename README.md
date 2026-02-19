@@ -87,6 +87,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/login` redirects to WordPress login
 - `/wp-admin` redirects to WordPress admin
 - Custom branded 404 page wired to headless navigation/footer
+- `/manifest.webmanifest` generated PWA manifest
 
 ### WordPress webhook for instant updates
 

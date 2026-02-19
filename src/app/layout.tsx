@@ -7,7 +7,26 @@ import { getSiteUrl } from "@/ai/site-url";
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: "Susinsight | Advancing Sustainability in Africa",
-  description: "Susinsight homepage design imported from AI Studio."
+  description: "Independent media platform advancing sustainability in Africa.",
+  applicationName: "Susinsight",
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/rss+xml": [{ url: "/feed.xml", title: "Susinsight RSS Feed" }]
+    }
+  },
+  openGraph: {
+    title: "Susinsight | Advancing Sustainability in Africa",
+    description: "Independent media platform advancing sustainability in Africa.",
+    url: "/",
+    siteName: "Susinsight",
+    type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Susinsight | Advancing Sustainability in Africa",
+    description: "Independent media platform advancing sustainability in Africa."
+  }
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
