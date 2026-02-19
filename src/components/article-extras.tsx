@@ -324,38 +324,38 @@ export function ArticleExtras({ authors, categories, tags, primaryCategoryName, 
     <div className="space-y-12 mt-16">
       <AuthorSection authors={authors} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-stone-200 pt-12 h-full">
-        {/* Secondary Categories */}
-        {secondaryCategories.length > 0 && (
-          <div className="flex flex-col h-full">
-            <p className="font-heading text-xs font-bold uppercase tracking-widest text-stone-400 mb-6 px-2">In Categories</p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {displayCategories.map((cat) => (
-                <a
-                  key={cat.slug}
-                  href={`/category/${cat.slug}`}
-                  className="px-4 py-1.5 rounded-full border border-stone-200 text-xs font-heading font-bold text-stone-600 hover:bg-brand-light hover:border-brand-primary/30 transition-all flex items-center gap-1.5"
-                >
-                  {cat.name}
-                </a>
-              ))}
-            </div>
-            {secondaryCategories.length > CAT_LIMIT && (
-              <button
-                onClick={() => setShowAllCategories(!showAllCategories)}
-                className="text-stone-400 hover:text-brand-primary text-[10px] font-heading font-bold uppercase tracking-widest flex items-center gap-1 mt-auto self-start px-2 py-2"
+      {/* Categories / Filed Under Section */}
+      {secondaryCategories.length > 0 && (
+        <div className="border-t border-stone-200 pt-12">
+          <p className="font-heading text-xs font-bold uppercase tracking-widest text-stone-400 mb-6 px-2">Filed Under</p>
+          <div className="flex flex-wrap gap-2 px-2">
+            {displayCategories.map((cat) => (
+              <a
+                key={cat.slug}
+                href={`/category/${cat.slug}`}
+                className="px-4 py-1.5 rounded-full border border-stone-200 bg-stone-50/50 text-xs font-heading font-bold text-stone-600 hover:bg-brand-light hover:border-brand-primary/30 hover:text-brand-primary transition-all flex items-center gap-1.5"
               >
-                {showAllCategories ? (
-                  <>Show Less <ChevronUp className="w-3 h-3" /></>
-                ) : (
-                  <>Show {secondaryCategories.length - CAT_LIMIT} More <ChevronDown className="w-3 h-3" /></>
-                )}
-              </button>
-            )}
+                {cat.name}
+              </a>
+            ))}
           </div>
-        )}
+          {secondaryCategories.length > CAT_LIMIT && (
+            <button
+              onClick={() => setShowAllCategories(!showAllCategories)}
+              className="text-stone-400 hover:text-brand-primary text-[10px] font-heading font-bold uppercase tracking-widest flex items-center gap-1 mt-4 self-start px-2 py-2"
+            >
+              {showAllCategories ? (
+                <>Show Less <ChevronUp className="w-3 h-3" /></>
+              ) : (
+                <>Show All Categories <ChevronDown className="w-3 h-3" /></>
+              )}
+            </button>
+          )}
+        </div>
+      )}
 
-        {/* Tags */}
+      {/* Tags Section */}
+      <div className="border-t border-stone-200 pt-12">
         <TagsSection tags={tags} />
       </div>
     </div>

@@ -279,10 +279,10 @@ async function ExampleArticlePage() {
                 <div>
                   <p className="font-heading text-xs uppercase tracking-widest text-stone-500 mb-1">Authors</p>
                   <div className="font-body text-brand-dark flex flex-wrap gap-2">
-                    {exampleArticle.authors.map((author, i) => (
-                      <React.Fragment key={author}>
-                        <a href={`/author/${author.toLowerCase().replace(/\s+/g, '-')}`} className="hover:underline hover:text-brand-primary transition-colors">
-                          {author}
+                    {exampleArticle.authors.map((author: any, i) => (
+                      <React.Fragment key={author.name}>
+                        <a href={`/author/${author.name.toLowerCase().replace(/\s+/g, '-')}`} className="hover:underline hover:text-brand-primary transition-colors">
+                          {author.name}
                         </a>
                         {i < exampleArticle.authors.length - 1 && <span>·</span>}
                       </React.Fragment>
@@ -343,16 +343,12 @@ async function ExampleArticlePage() {
 
               <ArticleActionsMobile title={exampleArticle.title} />
 
-              <AuthorSection
-                authors={exampleArticle.authors.map(author => ({
-                  name: author,
-                  bio: `${author} is a Contributing Researcher and Writer at Susinsight, focusing on sustainable systemic change.`
-                }))}
+              <ArticleExtras
+                authors={exampleArticle.authors as any}
+                categories={exampleArticle.categories as any}
+                tags={exampleArticle.tags.map(tag => ({ name: tag, slug: tag.toLowerCase().replace(/\s+/g, '-') }))}
+                primaryCategoryName={exampleArticle.category}
               />
-
-              <div className="border-t border-stone-200 pt-8 mt-10">
-                <TagsSection tags={exampleArticle.tags.map(tag => ({ name: tag, slug: tag.toLowerCase().replace(/\s+/g, '-') }))} />
-              </div>
 
               <ArticlePagination
                 previous={{ slug: "bamboo-climate-case", title: "The Climate Case for Bamboo Is Clear. So Why Isn’t the Money Moving?" }}

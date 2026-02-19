@@ -7,8 +7,33 @@ export const exampleArticle = {
     "Fiber cables and cloud servers don’t get much attention, but they’re changing lives—from smart farms in Uganda to online classrooms in Nigeria.",
   publishedAt: "2026-02-17T08:00:00Z",
   readTime: "18 min read",
-  authors: ["Adetumilara Adetayo", "Tomi Abe"],
+  authors: [
+    {
+      name: "Adetumilara Adetayo",
+      avatar: "https://picsum.photos/seed/author1/400/400",
+      bio: "Adetumilara is a Contributing Researcher and Writer at Susinsight, focusing on digital ecosystems."
+    },
+    {
+      name: "Tomi Abe",
+      avatar: "https://picsum.photos/seed/author2/400/400",
+      bio: "Tomi is the Founder of Susinsight and a specialist in African sustainable development."
+    }
+  ],
   editors: ["Jessica Ireju", "Adetola Adetayo"],
+  categories: [
+    { name: "Across Africa", slug: "across-africa" },
+    { name: "Africa Industrialization Day", slug: "africa-industrialization-day" },
+    { name: "Clean Energy", slug: "clean-energy" },
+    { name: "Climate Action", slug: "climate-action" },
+    { name: "Economic Growth", slug: "economic-growth" },
+    { name: "Innovation and Infrastructure", slug: "innovation-and-infrastructure" },
+    { name: "Quality Education", slug: "quality-education" },
+    { name: "Reduced Inequality", slug: "reduced-inequality" },
+    { name: "Responsible Consumption", slug: "responsible-consumption" },
+    { name: "Sustainable Cities", slug: "sustainable-cities" },
+    { name: "Tech for Tomorrow", slug: "tech-for-tomorrow" },
+    { name: "World Cities Day", slug: "world-cities-day" }
+  ],
   tags: [
     "Digital Infrastructure", "Connectivity", "Economic Growth", "Climate Tech", "Policy",
     "Africa Tech", "Digital Leap", "Sustainable Dev", "Broadband Access", "Emerging Markets",
