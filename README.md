@@ -69,6 +69,9 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/stories` live WordPress story archive
 - `/<page-slug>` live WordPress Page route (catch-all for non-post pages)
 - Legacy unknown paths auto-attempt a story redirect by final slug segment
+- Legacy WordPress date permalinks (`/YYYY/MM/DD/slug` and `/YYYY/MM/slug`) redirect to `/stories/slug`
+- `/feed` and `/rss` redirect to `/feed.xml`
+- `/wp-login.php` redirects to `/login`
 - `/category/[slug]` live WordPress category archive
 - `/tag/[slug]` live WordPress tag archive
 - `/author/[slug]` live WordPress author archive
