@@ -702,3 +702,127 @@ export async function getPageByUri(uri: string, options?: { preview?: boolean })
   );
   return data?.page || null;
 }
+
+export async function getCategoryArchive(slug: string): Promise<{
+  name: string;
+  slug: string;
+  description?: string | null;
+  posts: Article[];
+} | null> {
+  const query = /* GraphQL */ `
+    query CategoryArchive($slug: ID!) {
+      category(id: $slug, idType: SLUG) {
+        name
+        slug
+        description
+        posts(first: 24, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+          nodes {
+            id
+            slug
+            title
+            excerpt
+            date
+            author {
+              node {
+                name
+              }
+            }
+            featuredImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+            categories {
+              nodes {
+                name
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{
+    category?: {
+      name?: string | null;
+      slug?: string | null;
+      description?: string | null;
+      posts?: { nodes: WpPostNode[] } | null;
+    } | null;
+  }>(query, { slug });
+
+  const category = data?.category;
+  if (!category?.slug || !category?.name) return null;
+
+  return {
+    name: category.name,
+    slug: category.slug,
+    description: category.description || null,
+    posts: (category.posts?.nodes || []).map(toArticle)
+  };
+}
+
+export async function getTagArchive(slug: string): Promise<{
+  name: string;
+  slug: string;
+  description?: string | null;
+  posts: Article[];
+} | null> {
+  const query = /* GraphQL */ `
+    query TagArchive($slug: ID!) {
+      tag(id: $slug, idType: SLUG) {
+        name
+        slug
+        description
+        posts(first: 24, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+          nodes {
+            id
+            slug
+            title
+            excerpt
+            date
+            author {
+              node {
+                name
+              }
+            }
+            featuredImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+            categories {
+              nodes {
+                name
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{
+    tag?: {
+      name?: string | null;
+      slug?: string | null;
+      description?: string | null;
+      posts?: { nodes: WpPostNode[] } | null;
+    } | null;
+  }>(query, { slug });
+
+  const tag = data?.tag;
+  if (!tag?.slug || !tag?.name) return null;
+
+  return {
+    name: tag.name,
+    slug: tag.slug,
+    description: tag.description || null,
+    posts: (tag.posts?.nodes || []).map(toArticle)
+  };
+}

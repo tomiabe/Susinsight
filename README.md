@@ -62,6 +62,8 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/` AI Studio homepage with live WP data injected into hero/trending/signals/main sections
 - `/stories/[slug]` live WordPress article page
 - `/<page-slug>` live WordPress Page route (catch-all for non-post pages)
+- `/category/[slug]` live WordPress category archive
+- `/tag/[slug]` live WordPress tag archive
 - `/api/draft?secret=...&slug=...` enable draft mode and open a story preview
 - `/api/draft?secret=...&type=page&slug=/about/` enable draft mode and open a page preview
 - `/api/draft?secret=...&type=page&id=<wp-page-id>` preview a WP page by database ID
