@@ -238,35 +238,17 @@ export function SeriesCallout({ seriesName }: { seriesName: string }) {
   );
 }
 
-export function TagsSection({ tags }: { tags: TaxonomyItem[] }) {
+export function TagsSection({ tags, limit = 12 }: { tags: TaxonomyItem[]; limit?: number }) {
   const [showAll, setShowAll] = useState(false);
-  const [isOverflowing, setIsOverflowing] = useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const checkOverflow = () => {
-      if (containerRef.current) {
-        // We check against the collapsed height threshold (72px) 
-        // to see if we ever need a "Show More" button.
-        setIsOverflowing(containerRef.current.scrollHeight > 72);
-      }
-    };
-
-    checkOverflow();
-    window.addEventListener('resize', checkOverflow);
-    return () => window.removeEventListener('resize', checkOverflow);
-  }, [tags, showAll]);
+  const displayTags = showAll ? tags : tags.slice(0, limit);
 
   if (tags.length === 0) return null;
 
   return (
     <div className="flex flex-col h-full">
       <p className="font-heading text-[12px] uppercase tracking-widest text-stone-500 mb-4 px-2">Tags</p>
-      <div
-        ref={containerRef}
-        className={`flex flex-wrap gap-2 transition-all duration-300 overflow-hidden ${!showAll ? 'max-h-[72px]' : 'max-h-[2000px]'}`}
-      >
-        {tags.map((tag) => (
+      <div className="flex flex-wrap gap-2 transition-all duration-300">
+        {displayTags.map((tag) => (
           <a
             key={tag.slug}
             href={`/tag/${tag.slug}`}
@@ -276,7 +258,7 @@ export function TagsSection({ tags }: { tags: TaxonomyItem[] }) {
           </a>
         ))}
       </div>
-      {(isOverflowing || showAll) && (
+      {tags.length > limit && (
         <button
           onClick={() => setShowAll(!showAll)}
           className="text-stone-400 hover:text-brand-primary text-[10px] font-heading font-bold uppercase tracking-widest flex items-center gap-1 mt-4 self-start px-2"
