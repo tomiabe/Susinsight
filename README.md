@@ -24,6 +24,9 @@ In `.env.local`:
 
 ```env
 WORDPRESS_GRAPHQL_URL=https://susinsight.com/graphql
+WORDPRESS_BASE_URL=https://susinsight.com
+WORDPRESS_LOGIN_URL=
+WORDPRESS_ADMIN_URL=
 USE_WORDPRESS_CONTENT=false
 PREVIEW_SECRET=<long-random-string>
 REVALIDATE_SECRET=<long-random-string>
@@ -81,6 +84,8 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/robots.txt` generated robots policy
 - Story/page routes include canonical metadata and article structured data (JSON-LD)
 - Archive/search routes include canonical and Open Graph metadata
+- `/login` redirects to WordPress login
+- `/wp-admin` redirects to WordPress admin
 
 ### WordPress webhook for instant updates
 
