@@ -4,16 +4,18 @@ import {
   CONTENT_SECTIONS,
   CULTURAL_STORIES,
   EXPLORE_SERIES,
+  FOOTER_LINKS,
   FICTIONAL_STORIES,
   FOUNDER_CORNER,
   HERO_FEATURE,
   IMPACT_STORIES,
   LOWER_SECTIONS,
+  NAV_STRUCTURE,
   SIGNALS_PREVIEW,
   TRENDING_ARTICLES
 } from "@/ai/constants";
 import type { LiveHomeData, SeriesItem } from "@/ai/live-types";
-import type { Article, SectionData } from "@/ai/types";
+import type { Article, FooterColumn, NavItem, SectionData } from "@/ai/types";
 import { SECTION_CATEGORY_MAP } from "@/ai/wp-section-map";
 
 type WpPostNode = {
@@ -78,6 +80,14 @@ export type WpPageNode = {
   } | null;
 };
 
+type WpMenuItemNode = {
+  id: string;
+  label?: string | null;
+  parentId?: string | null;
+  url?: string | null;
+  path?: string | null;
+};
+
 const endpoint = process.env.WORDPRESS_GRAPHQL_URL;
 const headlessKey = process.env.HEADLESS_FETCH_KEY;
 const useWordPressContent = process.env.USE_WORDPRESS_CONTENT === "true";
@@ -100,6 +110,28 @@ function formatDate(date: string): string {
     day: "numeric",
     year: "numeric"
   });
+}
+
+function normalizeMenuHref(input: string | null | undefined): string {
+  if (!input) return "#";
+  const raw = input.trim();
+  if (!raw) return "#";
+  if (raw.startsWith("/") || raw.startsWith("#")) return raw;
+
+  try {
+    const parsed = new URL(raw);
+    const wpHost = endpoint ? new URL(endpoint).hostname : "";
+    const isSusinsightDomain =
+      parsed.hostname === "susinsight.com" ||
+      parsed.hostname.endsWith(".susinsight.com") ||
+      (wpHost && parsed.hostname === wpHost);
+
+    if (!isSusinsightDomain) return raw;
+    const localPath = `${parsed.pathname}${parsed.search}${parsed.hash}`.trim();
+    return localPath || "/";
+  } catch {
+    return raw;
+  }
 }
 
 function toArticle(post: WpPostNode): Article {
@@ -518,6 +550,124 @@ export async function getPostsByCategory(categoryName: string, count: number = 1
 
   // Fallback to latest posts if no category match
   return (data?.latest?.nodes || []).map(toArticle);
+}
+
+function mapFlatMenuToTree(items: WpMenuItemNode[]): NavItem[] {
+  const byId = new Map<string, NavItem>();
+  const roots: NavItem[] = [];
+
+  for (const item of items) {
+    const id = item.id;
+    const label = stripHtml(item.label) || "Untitled";
+    const href = normalizeMenuHref(item.path || item.url);
+    byId.set(id, { label, href });
+  }
+
+  for (const item of items) {
+    const current = byId.get(item.id);
+    if (!current) continue;
+
+    if (item.parentId && byId.has(item.parentId)) {
+      const parent = byId.get(item.parentId);
+      if (!parent) continue;
+      if (!parent.children) parent.children = [];
+      parent.children.push(current);
+    } else {
+      roots.push(current);
+    }
+  }
+
+  return roots;
+}
+
+function mapFlatMenuToFooterColumns(items: WpMenuItemNode[]): FooterColumn[] {
+  const tree = mapFlatMenuToTree(items);
+  return tree
+    .filter((node) => Array.isArray(node.children) && node.children.length > 0)
+    .map((node) => ({
+      title: node.label,
+      links: (node.children || []).map((child) => ({
+        label: child.label,
+        href: child.href
+      }))
+    }));
+}
+
+export async function getNavigationData(): Promise<{
+  navItems: NavItem[];
+  footerLinks: FooterColumn[];
+}> {
+  const navFallback = NAV_STRUCTURE;
+  const footerFallback = FOOTER_LINKS;
+
+  const query = /* GraphQL */ `
+    query HeadlessNavigation {
+      headerMenu: menuItems(where: { location: PRIMARY }, first: 200) {
+        nodes {
+          id
+          parentId
+          label
+          url
+          path
+        }
+      }
+      footerMenu: menuItems(where: { location: FOOTER }, first: 200) {
+        nodes {
+          id
+          parentId
+          label
+          url
+          path
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{
+    headerMenu?: { nodes: WpMenuItemNode[] };
+    footerMenu?: { nodes: WpMenuItemNode[] };
+  }>(query);
+
+  const headerNodes = data?.headerMenu?.nodes || [];
+  const footerNodes = data?.footerMenu?.nodes || [];
+
+  const navItems = headerNodes.length ? mapFlatMenuToTree(headerNodes) : navFallback;
+  const footerLinks = footerNodes.length ? mapFlatMenuToFooterColumns(footerNodes) : footerFallback;
+
+  return {
+    navItems: navItems.length ? navItems : navFallback,
+    footerLinks: footerLinks.length ? footerLinks : footerFallback
+  };
+}
+
+export async function getPageById(id: number, options?: { preview?: boolean }): Promise<WpPageNode | null> {
+  const query = /* GraphQL */ `
+    query PageById($id: ID!, $asPreview: Boolean!) {
+      page(id: $id, idType: DATABASE_ID, asPreview: $asPreview) {
+        id
+        slug
+        uri
+        title
+        content
+        excerpt
+        date
+        modified
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{ page?: WpPageNode | null }>(
+    query,
+    { id, asPreview: Boolean(options?.preview) },
+    options
+  );
+  return data?.page || null;
 }
 
 export async function getPageByUri(uri: string, options?: { preview?: boolean }): Promise<WpPageNode | null> {

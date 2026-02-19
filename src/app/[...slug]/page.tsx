@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Footer, Header } from "@/ai/components/LayoutComponents";
-import { getPageByUri } from "@/ai/live-data";
+import { getNavigationData, getPageByUri } from "@/ai/live-data";
 
 type CatchAllPageProps = {
   params: {
@@ -34,13 +34,16 @@ export async function generateMetadata({ params }: CatchAllPageProps): Promise<M
 export default async function CatchAllPage({ params }: CatchAllPageProps) {
   const draft = await draftMode();
   const uri = toUri(params.slug);
-  const page = await getPageByUri(uri, { preview: draft.isEnabled });
+  const [page, navigation] = await Promise.all([
+    getPageByUri(uri, { preview: draft.isEnabled }),
+    getNavigationData()
+  ]);
 
   if (!page) return notFound();
 
   return (
     <div className="min-h-screen bg-white text-brand-dark">
-      <Header />
+      <Header navItems={navigation.navItems} />
 
       <main>
         <article className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -65,7 +68,7 @@ export default async function CatchAllPage({ params }: CatchAllPageProps) {
         </article>
       </main>
 
-      <Footer />
+      <Footer footerLinks={navigation.footerLinks} />
     </div>
   );
 }

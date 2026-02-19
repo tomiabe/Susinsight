@@ -3,6 +3,7 @@ import { Header, Footer, NewsletterBanner, PromoBanner, AdBanner, SpecialProject
 import { Section, ArticleGridItem, SusdataSection } from './ArticleComponents';
 import { Button, SectionTitle } from './ui';
 import type { LiveHomeData, SeriesItem } from '../live-types';
+import type { FooterColumn, NavItem } from '../types';
 import { 
   CONTENT_SECTIONS, 
   HERO_FEATURE, 
@@ -27,9 +28,11 @@ const SHOW_ADS = true;
 
 type ClassicHomeProps = {
   liveData?: LiveHomeData;
+  navItems?: NavItem[];
+  footerLinks?: FooterColumn[];
 };
 
-const ClassicHome: React.FC<ClassicHomeProps> = ({ liveData }) => {
+const ClassicHome: React.FC<ClassicHomeProps> = ({ liveData, navItems, footerLinks }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [showAnnouncement, setShowAnnouncement] = useState(true);
@@ -98,7 +101,7 @@ const ClassicHome: React.FC<ClassicHomeProps> = ({ liveData }) => {
         />
       )}
 
-      <Header />
+      <Header navItems={navItems} />
 
       <main className="flex-grow">
         
@@ -380,7 +383,7 @@ const ClassicHome: React.FC<ClassicHomeProps> = ({ liveData }) => {
       </main>
 
       {/* FOOTER (Dark Green) */}
-      <Footer />
+      <Footer footerLinks={footerLinks} />
     </div>
   );
 };

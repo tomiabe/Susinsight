@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { Button } from './ui';
 import { FOOTER_LINKS, NAV_STRUCTURE } from '../constants';
+import type { FooterColumn, NavItem } from '../types';
 
 const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇬🇧' },
@@ -64,7 +65,11 @@ export const AnnouncementBar: React.FC<{
     );
 };
 
-export const Header: React.FC = () => {
+type HeaderProps = {
+  navItems?: NavItem[];
+};
+
+export const Header: React.FC<HeaderProps> = ({ navItems }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState(LANGUAGES[0]);
@@ -103,7 +108,8 @@ export const Header: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const menuGridItems = NAV_STRUCTURE.filter(item => item.label !== 'Account' && item.label !== "What's Trending");
+  const resolvedNavItems = navItems && navItems.length ? navItems : NAV_STRUCTURE;
+  const menuGridItems = resolvedNavItems.filter(item => item.label !== 'Account' && item.label !== "What's Trending");
 
   const handleLangSelect = (lang: typeof LANGUAGES[0]) => {
     const value = `/en/${lang.code}`;
@@ -261,7 +267,13 @@ export const Header: React.FC = () => {
   );
 };
 
-export const Footer: React.FC = () => {
+type FooterProps = {
+  footerLinks?: FooterColumn[];
+};
+
+export const Footer: React.FC<FooterProps> = ({ footerLinks }) => {
+  const resolvedFooterLinks = footerLinks && footerLinks.length ? footerLinks : FOOTER_LINKS;
+
   return (
     <footer className="bg-brand-dark text-white pt-16 pb-8 font-body">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -287,7 +299,7 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {FOOTER_LINKS.map((col) => (
+          {resolvedFooterLinks.map((col) => (
             <div key={col.title}>
               <h4 className="font-heading font-bold text-lg mb-4 text-brand-light">{col.title}</h4>
               <ul className="space-y-2">

@@ -3,25 +3,22 @@ import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Mail } from "lucide-react";
-import { getLiveHomeData, getStoryBySlug, getPostsByCategory } from "@/ai/live-data";
+import { getLiveHomeData, getNavigationData, getStoryBySlug, getPostsByCategory } from "@/ai/live-data";
 import { exampleArticle } from "@/ai/article-example";
 import { getFallbackImageSrc } from "@/ai/image-fallback";
 import { Footer, Header } from "@/ai/components/LayoutComponents";
 import { RelatedArticles } from "@/components/related-articles";
 import { ArticlePagination } from "@/components/article-pagination";
 import { ArticleExtras } from "@/components/article-extras";
-import { AD_SPOTS, EXPLORE_SERIES } from "@/ai/constants";
+import { AD_SPOTS } from "@/ai/constants";
 import type { LiveHomeData } from "@/ai/live-types";
-import type { Article } from "@/ai/types";
+import type { FooterColumn, NavItem } from "@/ai/types";
 import {
   ArticleProgressBar,
-  ArticleShareInline,
   ArticleShareRail,
   ArticleClap,
   ArticleActionsMobile,
   SeriesCallout,
-  AuthorSection,
-  TagsSection,
   ArticleTextSizeControls,
   ArticleAudioPlayer,
   FeaturedImageWithCaption
@@ -198,9 +195,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-async function ExampleArticlePage() {
+async function ExampleArticlePage({
+  liveData,
+  navItems,
+  footerLinks
+}: {
+  liveData: LiveHomeData;
+  navItems: NavItem[];
+  footerLinks: FooterColumn[];
+}) {
   const category = exampleArticle.category;
-  const liveData = await getLiveHomeData();
   let articles = await getPostsByCategory(category, 10);
 
   // Mock data for demo if live data is unavailable
@@ -247,7 +251,7 @@ async function ExampleArticlePage() {
 
   return (
     <div className="min-h-screen bg-white text-brand-dark">
-      <Header />
+      <Header navItems={navItems} />
       <ArticleProgressBar />
 
       <main>
@@ -370,16 +374,19 @@ async function ExampleArticlePage() {
         </div>
       </main>
 
-      <Footer />
+      <Footer footerLinks={footerLinks} />
     </div>
   );
 }
 
 export default async function StoryPage({ params }: PageProps) {
-  const liveData = await getLiveHomeData();
+  const [liveData, navigation] = await Promise.all([
+    getLiveHomeData(),
+    getNavigationData()
+  ]);
 
   if (params.slug === exampleArticle.slug) {
-    return <ExampleArticlePage />;
+    return <ExampleArticlePage liveData={liveData} navItems={navigation.navItems} footerLinks={navigation.footerLinks} />;
   }
 
   const draft = await draftMode();
@@ -391,7 +398,7 @@ export default async function StoryPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-white text-brand-dark">
-      <Header />
+      <Header navItems={navigation.navItems} />
       <ArticleProgressBar />
 
       <main>
@@ -480,7 +487,7 @@ export default async function StoryPage({ params }: PageProps) {
         </div>
       </main>
 
-      <Footer />
+      <Footer footerLinks={navigation.footerLinks} />
     </div>
   );
 }

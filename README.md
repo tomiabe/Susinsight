@@ -35,6 +35,7 @@ Set `USE_WORDPRESS_CONTENT=true` to use live WordPress content via WPGraphQL.
 ### WordPress plugins required
 
 - `WPGraphQL`
+- `WPGraphQL Menus` (for CMS-managed header/footer menus)
 - `Advanced Custom Fields` (optional but recommended)
 - `WPGraphQL for ACF` (if using ACF fields)
 
@@ -44,6 +45,7 @@ Set `USE_WORDPRESS_CONTENT=true` to use live WordPress content via WPGraphQL.
 - Ensure posts are published with slugs for `/stories/[slug]`
 - Create standard WP Pages for routes like `/about`, `/contact`, `/advertise`, etc.
 - Keep page slugs clean because frontend URI matching uses WP page URI
+- Create a `PRIMARY` and `FOOTER` menu location in WordPress so navigation is controlled in WP Admin
 
 ## Run locally
 
@@ -61,6 +63,8 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/stories/[slug]` live WordPress article page
 - `/<page-slug>` live WordPress Page route (catch-all for non-post pages)
 - `/api/draft?secret=...&slug=...` enable draft mode and open a story preview
+- `/api/draft?secret=...&type=page&slug=/about/` enable draft mode and open a page preview
+- `/api/draft?secret=...&type=page&id=<wp-page-id>` preview a WP page by database ID
 - `/api/exit-draft` disable draft mode
 
 ## Notes

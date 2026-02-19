@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import ClassicHome from "./components/ClassicHome";
 import type { LiveHomeData } from "@/ai/live-types";
+import type { FooterColumn, NavItem } from "@/ai/types";
 
 type Theme = "light" | "dark";
 
@@ -23,9 +24,11 @@ export const useTheme = () => {
 
 type AppProps = {
   liveData?: LiveHomeData;
+  navItems?: NavItem[];
+  footerLinks?: FooterColumn[];
 };
 
-const App: React.FC<AppProps> = ({ liveData }) => {
+const App: React.FC<AppProps> = ({ liveData, navItems, footerLinks }) => {
   const [theme, setTheme] = useState<Theme>("light");
 
   const toggleTheme = () => {
@@ -43,7 +46,7 @@ const App: React.FC<AppProps> = ({ liveData }) => {
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <div className="font-body antialiased text-stone-900 bg-white dark:bg-black dark:text-white">
-        <ClassicHome liveData={liveData} />
+        <ClassicHome liveData={liveData} navItems={navItems} footerLinks={footerLinks} />
       </div>
     </ThemeContext.Provider>
   );

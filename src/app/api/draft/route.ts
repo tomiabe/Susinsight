@@ -1,6 +1,6 @@
 import { draftMode } from "next/headers";
 import { redirect } from "next/navigation";
-import { getStoryById } from "@/ai/live-data";
+import { getPageById, getStoryById } from "@/ai/live-data";
 
 type QueryMap = Record<string, string | undefined>;
 
@@ -17,17 +17,30 @@ export async function GET(request: Request) {
 
   const rawSlug = (params.slug || "").trim();
   const rawId = Number(params.id || "");
+  const type = (params.type || "post").toLowerCase();
 
   if (rawSlug) {
     const normalized = rawSlug.startsWith("/") ? rawSlug : `/${rawSlug}`;
-    const target = normalized.startsWith("/stories/") ? normalized : `/stories/${normalized.replace(/^\//, "")}`;
+    const target =
+      type === "page"
+        ? normalized
+        : normalized.startsWith("/stories/")
+          ? normalized
+          : `/stories/${normalized.replace(/^\//, "")}`;
     redirect(target);
   }
 
   if (Number.isFinite(rawId) && rawId > 0) {
-    const post = await getStoryById(rawId, { preview: true });
-    if (post?.slug) {
-      redirect(`/stories/${post.slug}`);
+    if (type === "page") {
+      const page = await getPageById(rawId, { preview: true });
+      if (page?.uri) {
+        redirect(page.uri);
+      }
+    } else {
+      const post = await getStoryById(rawId, { preview: true });
+      if (post?.slug) {
+        redirect(`/stories/${post.slug}`);
+      }
     }
   }
 
