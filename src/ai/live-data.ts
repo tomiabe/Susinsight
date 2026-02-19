@@ -945,3 +945,82 @@ export async function getSearchResults(term: string, count: number = 24): Promis
 
   return (data?.posts?.nodes || []).map(toArticle);
 }
+
+export async function getSitemapEntries(): Promise<Array<{ url: string; lastModified?: string }>> {
+  const query = /* GraphQL */ `
+    query HeadlessSitemapFeed {
+      posts(first: 200, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          slug
+          date
+          modified
+        }
+      }
+      pages(first: 200, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          uri
+          date
+          modified
+        }
+      }
+      categories(first: 100) {
+        nodes {
+          slug
+        }
+      }
+      tags(first: 100) {
+        nodes {
+          slug
+        }
+      }
+      users(first: 100, where: { hasPublishedPosts: true }) {
+        nodes {
+          slug
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{
+    posts?: { nodes: Array<{ slug?: string | null; date?: string | null; modified?: string | null }> };
+    pages?: { nodes: Array<{ uri?: string | null; date?: string | null; modified?: string | null }> };
+    categories?: { nodes: Array<{ slug?: string | null }> };
+    tags?: { nodes: Array<{ slug?: string | null }> };
+    users?: { nodes: Array<{ slug?: string | null }> };
+  }>(query);
+
+  const entries: Array<{ url: string; lastModified?: string }> = [];
+
+  for (const post of data?.posts?.nodes || []) {
+    if (!post.slug) continue;
+    entries.push({
+      url: `/stories/${post.slug}`,
+      lastModified: post.modified || post.date || undefined
+    });
+  }
+
+  for (const page of data?.pages?.nodes || []) {
+    if (!page.uri || page.uri === "/") continue;
+    entries.push({
+      url: page.uri,
+      lastModified: page.modified || page.date || undefined
+    });
+  }
+
+  for (const category of data?.categories?.nodes || []) {
+    if (!category.slug) continue;
+    entries.push({ url: `/category/${category.slug}` });
+  }
+
+  for (const tag of data?.tags?.nodes || []) {
+    if (!tag.slug) continue;
+    entries.push({ url: `/tag/${tag.slug}` });
+  }
+
+  for (const user of data?.users?.nodes || []) {
+    if (!user.slug) continue;
+    entries.push({ url: `/author/${user.slug}` });
+  }
+
+  return entries;
+}

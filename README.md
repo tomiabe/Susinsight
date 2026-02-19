@@ -27,6 +27,7 @@ WORDPRESS_GRAPHQL_URL=https://susinsight.com/graphql
 USE_WORDPRESS_CONTENT=false
 PREVIEW_SECRET=<long-random-string>
 WP_PREVIEW_TOKEN=
+NEXT_PUBLIC_SITE_URL=https://susinsight.vercel.app
 ```
 
 Set `USE_WORDPRESS_CONTENT=false` to run pure AI Studio static mode (no WP dependency).
@@ -66,6 +67,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/tag/[slug]` live WordPress tag archive
 - `/author/[slug]` live WordPress author archive
 - `/search?q=term` live WordPress post search
+- `/sitemap.xml` generated from WordPress posts/pages/taxonomies/authors
 - `/api/draft?secret=...&slug=...` enable draft mode and open a story preview
 - `/api/draft?secret=...&type=page&slug=/about/` enable draft mode and open a page preview
 - `/api/draft?secret=...&type=page&id=<wp-page-id>` preview a WP page by database ID
