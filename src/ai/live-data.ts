@@ -986,6 +986,57 @@ export async function getStoriesFeed(count: number = 30): Promise<Article[]> {
   return (data?.posts?.nodes || []).map(toArticle);
 }
 
+export async function getRssFeedItems(count: number = 50): Promise<Array<{
+  title: string;
+  slug: string;
+  excerpt: string;
+  content?: string;
+  date?: string;
+  author?: string;
+  categories: string[];
+}>> {
+  const query = /* GraphQL */ `
+    query RssFeed($count: Int!) {
+      posts(first: $count, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          slug
+          title
+          excerpt
+          content
+          date
+          author {
+            node {
+              name
+            }
+          }
+          categories {
+            nodes {
+              name
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{ posts?: { nodes: WpPostNode[] } }>(
+    query,
+    { count }
+  );
+
+  return (data?.posts?.nodes || [])
+    .filter((post) => Boolean(post.slug))
+    .map((post) => ({
+      title: stripHtml(post.title),
+      slug: post.slug,
+      excerpt: stripHtml(post.excerpt),
+      content: post.content || undefined,
+      date: post.date,
+      author: post.author?.node?.name || undefined,
+      categories: (post.categories?.nodes || []).map((category) => category.name)
+    }));
+}
+
 export async function getSitemapEntries(): Promise<Array<{ url: string; lastModified?: string }>> {
   const query = /* GraphQL */ `
     query HeadlessSitemapFeed {

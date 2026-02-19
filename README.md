@@ -70,6 +70,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/author/[slug]` live WordPress author archive
 - `/search?q=term` live WordPress post search
 - `/sitemap.xml` generated from WordPress posts/pages/taxonomies/authors
+- `/feed.xml` live RSS feed generated from WordPress posts
 - `/api/draft?secret=...&slug=...` enable draft mode and open a story preview
 - `/api/draft?secret=...&type=page&slug=/about/` enable draft mode and open a page preview
 - `/api/draft?secret=...&type=page&id=<wp-page-id>` preview a WP page by database ID
