@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ChevronDown, ChevronUp, Link as LinkIcon, ArrowRight, Share2, Facebook, Twitter, Linkedin, MessageSquare, Minus, Plus, Search, Volume2, Pause, Play, Square, Settings } from "lucide-react";
 import { useEffect } from "react";
 
@@ -185,153 +185,286 @@ export function ArticleTextSizeControls() {
   );
 }
 
+// Voice presets — mapped to generic gender choices for Chatterbox backend.
+const TTS_VOICES = [
+  { id: 'female', label: 'Female', description: 'Default female voice' },
+  { id: 'male', label: 'Male', description: 'Default male voice' },
+] as const;
+
+type TtsVoiceId = typeof TTS_VOICES[number]['id'];
+
+// Split long text into chunks ≤ 4800 chars at sentence boundaries
+function chunkText(text: string, maxLen = 4800): string[] {
+  const chunks: string[] = [];
+  let remaining = text;
+  while (remaining.length > maxLen) {
+    let cut = remaining.lastIndexOf('. ', maxLen);
+    if (cut === -1) cut = maxLen;
+    else cut += 1;
+    chunks.push(remaining.slice(0, cut).trim());
+    remaining = remaining.slice(cut).trim();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks;
+}
+
+// Scrape article content — headline, excerpt, body only (no authors/dates/newsletter)
+function scrapeArticleText(): string {
+  const fragments: string[] = [];
+
+  // 1. Headline
+  const headline = document.querySelector('h1');
+  if (headline) fragments.push(headline.textContent?.trim() || '');
+
+  // 2. Excerpt / subheadline
+  const excerpt =
+    document.querySelector('article > p.font-serif') ||
+    document.querySelector('.story-content p:first-child');
+  if (excerpt) {
+    const t = excerpt.textContent?.trim() || '';
+    if (t && !fragments.includes(t)) fragments.push(t);
+  }
+
+  // 3. Main article sections (skip newsletter, forms, subscribe blocks)
+  const storyContent = document.querySelector('.story-content');
+  if (storyContent) {
+    Array.from(storyContent.querySelectorAll('p, h2, h3')).forEach(el => {
+      const text = el.textContent?.trim();
+      if (!text) return;
+      const skip =
+        el.closest('.bg-brand-light') ||
+        el.closest('form') ||
+        text.toLowerCase().includes('subscribe') ||
+        text.toLowerCase().includes('newsletter');
+      if (!skip && !fragments.includes(text)) fragments.push(text);
+    });
+  }
+
+  return fragments.join('. ');
+}
+
+function getCurrentLanguageCode(): string {
+  const htmlLang = document.documentElement.lang?.toLowerCase().trim();
+  if (htmlLang) return htmlLang;
+
+  const cookieMatch = document.cookie.match(/(?:^|;\s*)googtrans=([^;]+)/);
+  if (cookieMatch?.[1]) {
+    const parts = decodeURIComponent(cookieMatch[1]).split('/');
+    const maybeLang = parts[parts.length - 1]?.toLowerCase().trim();
+    if (maybeLang) return maybeLang;
+  }
+
+  return 'en';
+}
+
+function normalizeLanguageCode(code: string): string {
+  const raw = code.toLowerCase();
+  const map: Record<string, string> = {
+    'en-us': 'en',
+    'en-gb': 'en',
+    'fr-fr': 'fr',
+    'es-es': 'es',
+    'es-419': 'es',
+    'pt-br': 'pt',
+    'pt-pt': 'pt',
+    'zh-cn': 'zh',
+    'zh-tw': 'zh',
+    'zh-hk': 'zh',
+    'ar-sa': 'ar',
+  };
+
+  if (map[raw]) return map[raw];
+  if (raw.includes('-')) return raw.split('-')[0];
+  return raw || 'en';
+}
+
 export function ArticleAudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [synth, setSynth] = useState<SpeechSynthesis | null>(null);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [selectedVoiceName, setSelectedVoiceName] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<TtsVoiceId>('female');
   const [rate, setRate] = useState(1);
   const [showSettings, setShowSettings] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [audioLanguage, setAudioLanguage] = useState("en");
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const chunksRef = useRef<string[]>([]);
+  const chunkIndexRef = useRef(0);
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Clean up on unmount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const s = window.speechSynthesis;
-      setSynth(s);
-
-      const loadVoices = () => {
-        const availableVoices = s.getVoices();
-        setVoices(availableVoices);
-
-        if (!selectedVoiceName && availableVoices.length > 0) {
-          const preferred = availableVoices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('google'))
-            || availableVoices.find(v => v.lang.startsWith('en'))
-            || availableVoices[0];
-          if (preferred) setSelectedVoiceName(preferred.name);
-        }
-      };
-
-      loadVoices();
-      if (s.onvoiceschanged !== undefined) {
-        s.onvoiceschanged = loadVoices;
-      }
-    }
     return () => {
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
+      abortRef.current?.abort();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
       }
     };
-  }, [selectedVoiceName]);
+  }, []);
 
-  const getLanguage = () => {
-    if (typeof window === 'undefined') return 'en';
-    const langAttr = document.documentElement.lang;
-    return langAttr || 'en';
+  // Keep audio playback rate in sync with rate slider
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.playbackRate = rate;
+  }, [rate]);
+
+  useEffect(() => {
+    setAudioLanguage(normalizeLanguageCode(getCurrentLanguageCode()));
+  }, []);
+
+  const isEnglish = audioLanguage === "en";
+
+  const fetchAndPlayChunk = async (chunkIndex: number, voice: TtsVoiceId, language: string) => {
+    const chunks = chunksRef.current;
+    if (chunkIndex >= chunks.length) {
+      // All chunks played — done
+      setIsPlaying(false);
+      setIsPaused(false);
+      return;
+    }
+
+    setIsLoading(chunkIndex === 0); // show loading only on first chunk
+
+    try {
+      abortRef.current = new AbortController();
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: chunks[chunkIndex],
+          voice,
+          rate,
+          language,
+        }),
+        signal: abortRef.current.signal,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'TTS failed' }));
+        const detail =
+          typeof err?.detail === 'string'
+            ? err.detail
+            : err?.detail?.message || err?.detail?.error || '';
+        throw new Error(detail || err.error || 'TTS request failed');
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      const audio = new Audio(url);
+      audio.playbackRate = rate;
+      audioRef.current = audio;
+
+      audio.oncanplay = () => setIsLoading(false);
+
+      audio.onended = () => {
+        URL.revokeObjectURL(url);
+        chunkIndexRef.current = chunkIndex + 1;
+        fetchAndPlayChunk(chunkIndex + 1, voice, language);
+      };
+
+      audio.onerror = () => {
+        setIsPlaying(false);
+        setIsLoading(false);
+        setError('Playback error. Please try again.');
+      };
+
+      await audio.play();
+      setIsPlaying(true);
+      setIsLoading(false);
+      setError(null);
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return; // user stopped
+      console.error('[ArticleAudioPlayer] TTS playback failed:', err);
+      setIsPlaying(false);
+      setIsLoading(false);
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Chatterbox audio failed. Check your TTS server connection.'
+      );
+    }
   };
 
   const handlePlay = () => {
-    if (!synth) return;
+    const language = normalizeLanguageCode(getCurrentLanguageCode());
+    if (language !== "en") {
+      setError("Audio is currently available in English only.");
+      return;
+    }
 
-    if (isPaused) {
-      synth.resume();
+    if (isPaused && audioRef.current) {
+      audioRef.current.play();
       setIsPaused(false);
       setIsPlaying(true);
       return;
     }
 
-    synth.cancel();
+    // Fresh start — scrape content and begin
+    const text = scrapeArticleText();
+    if (!text) { setError('No article content found.'); return; }
 
-    const fragments: string[] = [];
-
-    // 1. Headline
-    const headline = document.querySelector('h1');
-    if (headline) fragments.push(headline.textContent?.trim() || "");
-
-    // 2. Excerpt / Subheadline
-    const excerpt = document.querySelector('article > p.font-serif') || document.querySelector('.story-content p:first-child');
-    if (excerpt && !fragments.includes(excerpt.textContent?.trim() || "")) {
-      fragments.push(excerpt.textContent?.trim() || "");
-    }
-
-    // Note: Skipping authors, editors, and date as per request
-
-    // 3. Main Article Sections
-    const storyContent = document.querySelector('.story-content');
-    if (storyContent) {
-      const elements = Array.from(storyContent.querySelectorAll('p, h2, h3'));
-      elements.forEach(el => {
-        // Skip newsletter and other UI callouts
-        // We look for common newsletter patterns or containers
-        const text = el.textContent?.trim();
-        if (!text) return;
-
-        const isNewsletter = el.closest('.bg-brand-light') ||
-          el.closest('form') ||
-          text.toLowerCase().includes('subscribe') ||
-          text.toLowerCase().includes('newsletter');
-
-        if (!isNewsletter) {
-          // Avoid duplicating the excerpt if it was the first paragraph
-          if (!fragments.includes(text)) {
-            fragments.push(text);
-          }
-        }
-      });
-    }
-
-    const fullText = fragments.join(". ");
-    if (!fullText) return;
-
-    const utterance = new SpeechSynthesisUtterance(fullText);
-    const voice = voices.find(v => v.name === selectedVoiceName);
-    if (voice) utterance.voice = voice;
-    utterance.rate = rate;
-    utterance.pitch = 1.0;
-    utterance.lang = getLanguage();
-
-    utterance.onend = () => {
-      setIsPlaying(false);
-      setIsPaused(false);
-    };
-
-    utterance.onerror = () => {
-      setIsPlaying(false);
-      setIsPaused(false);
-    };
-
-    synth.speak(utterance);
-    setIsPlaying(true);
+    chunksRef.current = chunkText(text);
+    chunkIndexRef.current = 0;
+    setError(null);
+    fetchAndPlayChunk(0, selectedVoice, language);
   };
 
   const handlePause = () => {
-    if (synth && isPlaying) {
-      synth.pause();
+    if (audioRef.current && isPlaying) {
+      audioRef.current.pause();
       setIsPaused(true);
       setIsPlaying(false);
     }
   };
 
   const handleStop = () => {
-    if (synth) {
-      synth.cancel();
-      setIsPlaying(false);
-      setIsPaused(false);
+    abortRef.current?.abort();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+      audioRef.current = null;
     }
+    chunksRef.current = [];
+    chunkIndexRef.current = 0;
+    setIsPlaying(false);
+    setIsPaused(false);
+    setIsLoading(false);
+    setError(null);
   };
 
-  const currentLang = typeof window !== 'undefined' ? getLanguage().split('-')[0] : 'en';
-  const filteredVoices = voices.filter(v => v.lang.startsWith(currentLang));
+  // When voice changes mid-session, restart from beginning
+  const handleVoiceChange = (v: TtsVoiceId) => {
+    handleStop();
+    setSelectedVoice(v);
+  };
 
   return (
-    <div className="flex items-center gap-1 bg-white border border-stone-200 rounded-full p-1 shadow-sm h-[42px] relative">
+    <div
+      className={`flex items-center gap-1 border rounded-full p-1 shadow-sm h-[42px] relative ${
+        isEnglish ? "bg-white border-stone-200" : "bg-stone-100 border-stone-300 opacity-70"
+      }`}
+    >
+      {/* Play / Pause / Resume button area */}
       {!isPlaying && !isPaused ? (
         <button
           onClick={handlePlay}
-          className="px-4 h-full flex items-center justify-center gap-2 hover:bg-stone-50 text-stone-600 hover:text-brand-primary transition-all rounded-full group"
+          disabled={isLoading || !isEnglish}
+          className="px-4 h-full flex items-center justify-center gap-2 hover:bg-stone-50 text-stone-600 hover:text-brand-primary transition-all rounded-full group disabled:opacity-60 disabled:cursor-not-allowed"
           aria-label="Listen to article"
         >
-          <Volume2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          <span className="text-[10px] font-body font-bold uppercase tracking-wider">Listen</span>
+          {isLoading ? (
+            <svg className="w-4 h-4 animate-spin text-brand-primary" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+            </svg>
+          ) : (
+            <Volume2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          )}
+          <span className="text-[10px] font-body font-bold uppercase tracking-wider">
+            {isLoading ? 'Loading…' : 'Listen'}
+          </span>
         </button>
       ) : (
         <div className="flex items-center h-full gap-1">
@@ -352,7 +485,7 @@ export function ArticleAudioPlayer() {
               <Play className="w-4 h-4 fill-current" />
             </button>
           )}
-          <div className="h-4 w-px bg-stone-200"></div>
+          <div className="h-4 w-px bg-stone-200" />
           <button
             onClick={handleStop}
             className="w-8 h-full flex items-center justify-center hover:bg-stone-50 text-stone-400 hover:text-red-500 transition-all group"
@@ -363,38 +496,64 @@ export function ArticleAudioPlayer() {
         </div>
       )}
 
-      <div className="h-4 w-px bg-stone-200"></div>
+      <div className="h-4 w-px bg-stone-200" />
 
+      {/* Settings toggle */}
       <button
-        onClick={() => setShowSettings(!showSettings)}
-        className={`w-10 h-full flex items-center justify-center rounded-r-full hover:bg-stone-50 transition-all ${showSettings ? 'text-brand-primary' : 'text-stone-400'}`}
+        onClick={() => isEnglish && setShowSettings(!showSettings)}
+        disabled={!isEnglish}
+        className={`w-10 h-full flex items-center justify-center rounded-r-full hover:bg-stone-50 transition-all disabled:cursor-not-allowed ${showSettings ? 'text-brand-primary' : 'text-stone-400'}`}
         aria-label="Audio settings"
       >
-        <Settings className={`w-4 h-4 ${showSettings ? 'animate-spin-slow' : ''}`} />
+        <Settings className={`w-4 h-4 ${showSettings ? 'rotate-45' : ''} transition-transform duration-200`} />
       </button>
 
+      {/* Error message */}
+      {error && (
+        <div className="absolute top-full mt-2 right-0 bg-red-50 border border-red-200 text-red-600 text-[10px] font-body rounded-lg px-3 py-2 z-50">
+          {error}
+        </div>
+      )}
+
+      {!isEnglish && !error && (
+        <div className="absolute top-full mt-2 right-0 bg-stone-100 border border-stone-300 text-stone-600 text-[10px] font-body rounded-lg px-3 py-2 z-50">
+          Audio available in English only.
+        </div>
+      )}
+
+      {/* Settings panel */}
       {showSettings && (
-        <div className="absolute top-full mt-2 right-0 w-72 bg-white border border-stone-200 rounded-2xl shadow-xl z-50 p-5 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-full mt-2 right-0 w-72 bg-white border border-stone-200 rounded-2xl shadow-xl z-50 p-5 font-body">
           <div className="space-y-5">
+
+            {/* Voice selector — 3 pill buttons */}
             <div>
-              <label className="block font-heading text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2">Voice Selector</label>
-              <select
-                value={selectedVoiceName}
-                onChange={(e) => setSelectedVoiceName(e.target.value)}
-                className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs font-body focus:outline-none focus:border-brand-primary/30"
-              >
-                {filteredVoices.map(v => (
-                  <option key={v.name} value={v.name}>{v.name}</option>
+              <label className="block font-body text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2">
+                Voice
+              </label>
+              <div className="flex gap-2">
+                {TTS_VOICES.map(v => (
+                  <button
+                    key={v.id}
+                    onClick={() => handleVoiceChange(v.id)}
+                    className={`flex-1 py-2 px-2 rounded-lg border text-center transition-all ${selectedVoice === v.id
+                      ? 'bg-brand-primary text-white border-brand-primary'
+                      : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-brand-primary/40'
+                      }`}
+                  >
+                    <div className="text-[11px] font-body font-semibold">{v.label}</div>
+                    <div className={`text-[8px] font-body mt-0.5 ${selectedVoice === v.id ? 'text-white/70' : 'text-stone-400'}`}>
+                      {v.description.split(' · ')[0]}
+                    </div>
+                  </button>
                 ))}
-                {filteredVoices.length === 0 && voices.map(v => (
-                  <option key={v.name} value={v.name}>{v.name}</option>
-                ))}
-              </select>
+              </div>
             </div>
 
+            {/* Speed slider */}
             <div>
-              <label className="block font-heading text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2 flex justify-between">
-                Reading Speed <span>{rate}x</span>
+              <label className="font-body text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2 flex justify-between">
+                Reading Speed <span>{rate}×</span>
               </label>
               <div className="space-y-2">
                 <input
@@ -403,22 +562,22 @@ export function ArticleAudioPlayer() {
                   max="2"
                   step="0.25"
                   value={rate}
-                  onChange={(e) => setRate(parseFloat(e.target.value))}
+                  onChange={e => setRate(parseFloat(e.target.value))}
                   className="w-full accent-brand-primary h-1.5 bg-stone-100 rounded-lg appearance-none cursor-pointer"
                 />
-                <div className="flex justify-between text-[8px] font-heading font-bold text-stone-300 uppercase tracking-tighter">
-                  <span>Slow</span>
-                  <span>Normal</span>
-                  <span>Fast</span>
+                <div className="flex justify-between text-xs font-body font-normal text-black">
+                  <span>Slow</span><span>Normal</span><span>Fast</span>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       )}
     </div>
   );
 }
+
 
 export function FeaturedImageWithCaption({ src, alt, caption }: { src: string; alt: string; caption?: string }) {
   return (
