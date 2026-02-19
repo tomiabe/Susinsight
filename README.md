@@ -86,6 +86,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - Archive/search routes include canonical and Open Graph metadata
 - `/login` redirects to WordPress login
 - `/wp-admin` redirects to WordPress admin
+- Custom branded 404 page wired to headless navigation/footer
 
 ### WordPress webhook for instant updates
 
