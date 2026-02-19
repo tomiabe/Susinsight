@@ -292,6 +292,7 @@ export function ArticleAudioPlayer() {
   const chunksRef = useRef<string[]>([]);
   const chunkIndexRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
+  const rateRef = useRef(rate);
 
   const applyPlaybackRate = (audio: HTMLAudioElement, nextRate: number) => {
     audio.playbackRate = nextRate;
@@ -314,6 +315,7 @@ export function ArticleAudioPlayer() {
 
   // Keep audio playback rate in sync with rate slider
   useEffect(() => {
+    rateRef.current = rate;
     if (audioRef.current) applyPlaybackRate(audioRef.current, rate);
   }, [rate]);
 
@@ -342,7 +344,7 @@ export function ArticleAudioPlayer() {
         body: JSON.stringify({
           text: chunks[chunkIndex],
           voice,
-          rate,
+          rate: rateRef.current,
           language,
         }),
         signal: abortRef.current.signal,
@@ -361,7 +363,7 @@ export function ArticleAudioPlayer() {
       const url = URL.createObjectURL(blob);
 
       const audio = new Audio(url);
-      applyPlaybackRate(audio, rate);
+      applyPlaybackRate(audio, rateRef.current);
       audioRef.current = audio;
 
       audio.oncanplay = () => setIsLoading(false);
