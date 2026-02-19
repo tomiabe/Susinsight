@@ -946,6 +946,46 @@ export async function getSearchResults(term: string, count: number = 24): Promis
   return (data?.posts?.nodes || []).map(toArticle);
 }
 
+export async function getStoriesFeed(count: number = 30): Promise<Article[]> {
+  const query = /* GraphQL */ `
+    query StoriesFeed($count: Int!) {
+      posts(first: $count, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          id
+          slug
+          title
+          excerpt
+          date
+          author {
+            node {
+              name
+              slug
+            }
+          }
+          featuredImage {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+          categories {
+            nodes {
+              name
+              slug
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{ posts?: { nodes: WpPostNode[] } }>(
+    query,
+    { count }
+  );
+  return (data?.posts?.nodes || []).map(toArticle);
+}
+
 export async function getSitemapEntries(): Promise<Array<{ url: string; lastModified?: string }>> {
   const query = /* GraphQL */ `
     query HeadlessSitemapFeed {

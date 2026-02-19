@@ -63,6 +63,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - `/` AI Studio homepage with live WP data injected into hero/trending/signals/main sections
 - `/stories/[slug]` live WordPress article page
+- `/stories` live WordPress story archive
 - `/<page-slug>` live WordPress Page route (catch-all for non-post pages)
 - `/category/[slug]` live WordPress category archive
 - `/tag/[slug]` live WordPress tag archive
