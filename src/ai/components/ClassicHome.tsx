@@ -3,7 +3,6 @@ import { Header, Footer, NewsletterBanner, PromoBanner, AdBanner, SpecialProject
 import { Section, ArticleGridItem, SusdataSection } from './ArticleComponents';
 import { Button, SectionTitle } from './ui';
 import type { LiveHomeData, SeriesItem } from '../live-types';
-import { getFallbackImageSrc } from '@/ai/image-fallback';
 import { 
   CONTENT_SECTIONS, 
   HERO_FEATURE, 
@@ -140,14 +139,7 @@ const ClassicHome: React.FC<ClassicHomeProps> = ({ liveData }) => {
                                 {/* Image Side - Reduced Width & Height */}
                                 <div className="w-full md:w-5/12 h-[200px] md:h-auto relative overflow-hidden">
                                     <img 
-                                        src={
-                                          article.imageUrl ||
-                                          getFallbackImageSrc({
-                                            title: article.title,
-                                            category: article.category,
-                                            seed: article.imageSeed || i * 50
-                                          })
-                                        }
+                                        src={article.imageUrl || `https://picsum.photos/seed/${article.imageSeed || i * 50}/1200/800`}
                                         className="w-full h-full object-cover" 
                                         alt={article.imageAlt || article.title}
                                     />
@@ -350,14 +342,7 @@ const ClassicHome: React.FC<ClassicHomeProps> = ({ liveData }) => {
                         <div key={i} className="w-[300px] md:w-[340px] flex-shrink-0 bg-white/5 border border-white/10 p-6 rounded-lg hover:bg-white/10 transition-colors flex flex-col backdrop-blur-sm group cursor-pointer">
                             <div className="h-40 mb-6 overflow-hidden rounded-md bg-stone-900/50">
                                <img 
-                                src={
-                                  series.imageUrl ||
-                                  getFallbackImageSrc({
-                                    title: series.title,
-                                    category: "series",
-                                    seed: series.imageSeed || i * 200
-                                  })
-                                }
+                                src={series.imageUrl || `https://picsum.photos/seed/${series.imageSeed || i * 200}/600/400`}
                                 className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500" 
                                 alt={series.title} 
                                />

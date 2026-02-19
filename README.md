@@ -24,11 +24,13 @@ In `.env.local`:
 
 ```env
 WORDPRESS_GRAPHQL_URL=https://susinsight.com/graphql
+USE_WORDPRESS_CONTENT=false
 PREVIEW_SECRET=<long-random-string>
 WP_PREVIEW_TOKEN=
 ```
 
-If no endpoint is set or it is unavailable, the site falls back to your static AI Studio constants.
+Set `USE_WORDPRESS_CONTENT=false` to run pure AI Studio static mode (no WP dependency).
+Set `USE_WORDPRESS_CONTENT=true` to use live WordPress content via WPGraphQL.
 
 ## Run locally
 

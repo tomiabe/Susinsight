@@ -1,6 +1,8 @@
 export interface Article {
   title: string;
   author?: string;
+  authorAvatar?: string;
+  authorBio?: string;
   excerpt: string;
   category?: string;
   date?: string;

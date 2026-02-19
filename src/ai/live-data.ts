@@ -27,6 +27,10 @@ type WpPostNode = {
   author?: {
     node?: {
       name?: string | null;
+      description?: string | null;
+      avatar?: {
+        url?: string | null;
+      } | null;
     } | null;
   } | null;
   featuredImage?: {
@@ -41,9 +45,25 @@ type WpPostNode = {
       slug: string;
     }>;
   };
+  tags?: {
+    nodes: Array<{
+      name: string;
+      slug: string;
+    }>;
+  };
+  previous?: {
+    slug: string;
+    title: string;
+  } | null;
+  next?: {
+    slug: string;
+    title: string;
+  } | null;
 };
 
 const endpoint = process.env.WORDPRESS_GRAPHQL_URL;
+const headlessKey = process.env.HEADLESS_FETCH_KEY;
+const useWordPressContent = process.env.USE_WORDPRESS_CONTENT === "true";
 
 function stripHtml(html: string | null | undefined): string {
   if (!html) return "";
@@ -51,6 +71,9 @@ function stripHtml(html: string | null | undefined): string {
     .replace(/<[^>]*>/g, " ")
     .replace(/\s+/g, " ")
     .replace(/&nbsp;/g, " ")
+    .replace(/\[\.\.\.\]/g, "")
+    .replace(/&hellip;/g, "")
+    .replace(/\.\.\.$/, "")
     .trim();
 }
 
@@ -66,6 +89,8 @@ function toArticle(post: WpPostNode): Article {
   return {
     title: stripHtml(post.title),
     author: post.author?.node?.name || "Susinsight Staff",
+    authorAvatar: post.author?.node?.avatar?.url || undefined,
+    authorBio: post.author?.node?.description || undefined,
     excerpt: stripHtml(post.excerpt) || "Read the full story on Susinsight.",
     category: post.categories?.nodes?.[0]?.name,
     date: formatDate(post.date),
@@ -144,13 +169,14 @@ async function wpRequest<T>(
   variables?: Record<string, unknown>,
   options?: { preview?: boolean }
 ): Promise<T | null> {
-  if (!endpoint) return null;
+  if (!endpoint || !useWordPressContent) return null;
 
   try {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "content-type": "application/json",
+        ...(headlessKey ? { "x-susinsight-headless-key": headlessKey } : {}),
         ...(process.env.WP_PREVIEW_TOKEN ? { authorization: `Bearer ${process.env.WP_PREVIEW_TOKEN}` } : {})
       },
       body: JSON.stringify({ query, variables }),
@@ -315,6 +341,10 @@ export async function getStoryBySlug(slug: string, options?: { preview?: boolean
         author {
           node {
             name
+            description
+            avatar {
+              url
+            }
           }
         }
         featuredImage {
@@ -328,6 +358,20 @@ export async function getStoryBySlug(slug: string, options?: { preview?: boolean
             name
             slug
           }
+        }
+        tags {
+          nodes {
+            name
+            slug
+          }
+        }
+        previous {
+          slug
+          title
+        }
+        next {
+          slug
+          title
         }
       }
     }
@@ -354,6 +398,10 @@ export async function getStoryById(id: number, options?: { preview?: boolean }):
         author {
           node {
             name
+            description
+            avatar {
+              url
+            }
           }
         }
         featuredImage {
@@ -378,4 +426,79 @@ export async function getStoryById(id: number, options?: { preview?: boolean }):
     options
   );
   return data?.post || null;
+}
+
+export async function getPostsByCategory(categoryName: string, count: number = 10): Promise<Article[]> {
+  const query = /* GraphQL */ `
+    query PostsByCategory($categoryName: String, $count: Int!) {
+      posts(where: { categoryName: $categoryName }, first: $count) {
+        nodes {
+          id
+          slug
+          title
+          excerpt
+          date
+          author {
+            node {
+              name
+            }
+          }
+          featuredImage {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+          categories {
+            nodes {
+              name
+              slug
+            }
+          }
+        }
+      }
+      latest: posts(first: $count) {
+        nodes {
+          id
+          slug
+          title
+          excerpt
+          date
+          author {
+            node {
+              name
+            }
+          }
+          featuredImage {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+          categories {
+            nodes {
+              name
+              slug
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await wpRequest<{
+    posts?: { nodes: WpPostNode[] },
+    latest?: { nodes: WpPostNode[] }
+  }>(
+    query,
+    { categoryName, count }
+  );
+
+  const matched = data?.posts?.nodes || [];
+  if (matched.length > 0) {
+    return matched.map(toArticle);
+  }
+
+  // Fallback to latest posts if no category match
+  return (data?.latest?.nodes || []).map(toArticle);
 }

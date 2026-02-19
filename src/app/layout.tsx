@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "@/app/globals.css";
+import { ScrollToTopButton } from "@/components/scroll-to-top";
 
 export const metadata: Metadata = {
   title: "Susinsight | Advancing Sustainability in Africa",
@@ -16,7 +17,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=DM+Sans:opsz,wght@9..40,200..800&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Manrope:wght@200..800&display=swap"
           rel="stylesheet"
         />
         <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
@@ -31,9 +32,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           extend: {
             fontFamily: {
               heading: ['"Bricolage Grotesque"', 'sans-serif'],
-              serif: ['"Lora"', 'serif'],
+              serif: ['"Manrope"', 'sans-serif'],
               display: ['"Bricolage Grotesque"', 'sans-serif'],
-              body: ['"DM Sans"', 'sans-serif'],
+              body: ['"Manrope"', 'sans-serif'],
             },
             colors: {
               brand: {
@@ -70,6 +71,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <div id="google_translate_element" />
         {children}
+        <ScrollToTopButton />
 
         <Script id="google-translate-init" strategy="afterInteractive">
           {`function googleTranslateElementInit() {
