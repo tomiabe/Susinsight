@@ -22,11 +22,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
         <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
 
-        <script src="https://cdn.tailwindcss.com"></script>
+        {/* Tailwind config MUST be defined before the CDN script loads to avoid FOUC on refresh */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-      tailwind.config = {
+      window.tailwind = window.tailwind || {};
+      window.tailwind_config_pending = {
         darkMode: 'class',
         theme: {
           extend: {
@@ -63,6 +64,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             })
           }
         ]
+      };
+            `
+          }}
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+      if (window.tailwind && window.tailwind_config_pending) {
+        tailwind.config = window.tailwind_config_pending;
       }
             `
           }}
