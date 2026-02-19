@@ -293,6 +293,14 @@ export function ArticleAudioPlayer() {
   const chunkIndexRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
 
+  const applyPlaybackRate = (audio: HTMLAudioElement, nextRate: number) => {
+    audio.playbackRate = nextRate;
+    // Make speed changes audibly obvious across browsers.
+    (audio as HTMLAudioElement & { preservesPitch?: boolean; mozPreservesPitch?: boolean; webkitPreservesPitch?: boolean }).preservesPitch = false;
+    (audio as HTMLAudioElement & { preservesPitch?: boolean; mozPreservesPitch?: boolean; webkitPreservesPitch?: boolean }).mozPreservesPitch = false;
+    (audio as HTMLAudioElement & { preservesPitch?: boolean; mozPreservesPitch?: boolean; webkitPreservesPitch?: boolean }).webkitPreservesPitch = false;
+  };
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
@@ -306,7 +314,7 @@ export function ArticleAudioPlayer() {
 
   // Keep audio playback rate in sync with rate slider
   useEffect(() => {
-    if (audioRef.current) audioRef.current.playbackRate = rate;
+    if (audioRef.current) applyPlaybackRate(audioRef.current, rate);
   }, [rate]);
 
   useEffect(() => {
@@ -353,7 +361,7 @@ export function ArticleAudioPlayer() {
       const url = URL.createObjectURL(blob);
 
       const audio = new Audio(url);
-      audio.playbackRate = rate;
+      applyPlaybackRate(audio, rate);
       audioRef.current = audio;
 
       audio.oncanplay = () => setIsLoading(false);
