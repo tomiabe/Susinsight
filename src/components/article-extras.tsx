@@ -355,25 +355,25 @@ export function ArticleExtras({ authors, categories, tags, primaryCategoryName, 
   const grouped = {
     Region: secondaryCategories.filter(cat => regions.includes(cat.name)),
     Series: secondaryCategories.filter(cat => cat.name === "Tech for Tomorrow" || cat.name === seriesName),
-    SDGs: secondaryCategories.filter(cat =>
-      !regions.includes(cat.name) &&
-      cat.name !== "Tech for Tomorrow" &&
-      cat.name !== seriesName &&
-      sdgKeywords.some(sdg => cat.name.includes(sdg))
-    ),
     "World Days": secondaryCategories.filter(cat =>
       !regions.includes(cat.name) &&
       cat.name !== "Tech for Tomorrow" &&
       cat.name !== seriesName &&
-      !sdgKeywords.some(sdg => cat.name.includes(sdg)) &&
       cat.name.toLowerCase().includes("day")
+    ),
+    SDGs: secondaryCategories.filter(cat =>
+      !regions.includes(cat.name) &&
+      cat.name !== "Tech for Tomorrow" &&
+      cat.name !== seriesName &&
+      !cat.name.toLowerCase().includes("day") &&
+      sdgKeywords.some(sdg => cat.name.includes(sdg))
     ),
     Other: secondaryCategories.filter(cat =>
       !regions.includes(cat.name) &&
       cat.name !== "Tech for Tomorrow" &&
       cat.name !== seriesName &&
-      !sdgKeywords.some(sdg => cat.name.includes(sdg)) &&
-      !cat.name.toLowerCase().includes("day")
+      !cat.name.toLowerCase().includes("day") &&
+      !sdgKeywords.some(sdg => cat.name.includes(sdg))
     )
   };
 
