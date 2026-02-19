@@ -312,13 +312,70 @@ export function AuthorSection({ authors }: { authors: { name: string; avatar?: s
   );
 }
 
-export function ArticleExtras({ authors, categories, tags, primaryCategoryName, seriesName }: ArticleExtrasProps) {
-  const [showAllCategories, setShowAllCategories] = useState(false);
+export function CategoryGroup({ label, categories, showMoreThreshold = 0 }: { label: string; categories: TaxonomyItem[]; showMoreThreshold?: number }) {
+  const [showAll, setShowAll] = useState(false);
+  const displayItems = (showMoreThreshold > 0 && !showAll) ? categories.slice(0, showMoreThreshold) : categories;
 
+  if (categories.length === 0) return null;
+
+  return (
+    <div className="flex flex-col md:flex-row md:items-baseline gap-x-4 gap-y-3 mb-6 last:mb-0">
+      <h4 className="font-heading text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400 whitespace-nowrap min-w-[100px]">{label}:</h4>
+      <div className="flex flex-wrap gap-2 flex-1 items-center">
+        {displayItems.map(cat => (
+          <a
+            key={cat.slug}
+            href={`/category/${cat.slug}`}
+            className="px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50/50 text-[10px] font-body font-semibold text-stone-600 hover:bg-brand-light hover:border-brand-primary/30 hover:text-brand-primary transition-all"
+          >
+            {cat.name}
+          </a>
+        ))}
+        {showMoreThreshold > 0 && categories.length > showMoreThreshold && (
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="text-[10px] font-heading font-bold uppercase tracking-widest text-brand-primary/60 hover:text-brand-primary transition-colors ml-1"
+          >
+            {showAll ? "Show Less" : `+${categories.length - showMoreThreshold} More`}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function ArticleExtras({ authors, categories, tags, primaryCategoryName, seriesName }: ArticleExtrasProps) {
   // Filter out the primary category from the categories list
   const secondaryCategories = categories.filter(cat => cat.name !== primaryCategoryName);
-  const CAT_LIMIT = 5;
-  const displayCategories = showAllCategories ? secondaryCategories : secondaryCategories.slice(0, CAT_LIMIT);
+
+  // Grouping logic
+  const regions = ["Across Africa", "West Africa", "East Africa", "North Africa", "Southern Africa", "Central Africa"];
+  const sdgKeywords = ["Energy", "Climate", "Growth", "Infrastructure", "Education", "Inequality", "Consumption", "Cities", "Poverty", "Hunger", "Health", "Gender", "Water", "Work", "Life", "Justice", "Partnerships"];
+
+  const grouped = {
+    Region: secondaryCategories.filter(cat => regions.includes(cat.name)),
+    Series: secondaryCategories.filter(cat => cat.name === "Tech for Tomorrow" || cat.name === seriesName),
+    SDGs: secondaryCategories.filter(cat =>
+      !regions.includes(cat.name) &&
+      cat.name !== "Tech for Tomorrow" &&
+      cat.name !== seriesName &&
+      sdgKeywords.some(sdg => cat.name.includes(sdg))
+    ),
+    "World Days": secondaryCategories.filter(cat =>
+      !regions.includes(cat.name) &&
+      cat.name !== "Tech for Tomorrow" &&
+      cat.name !== seriesName &&
+      !sdgKeywords.some(sdg => cat.name.includes(sdg)) &&
+      cat.name.toLowerCase().includes("day")
+    ),
+    Other: secondaryCategories.filter(cat =>
+      !regions.includes(cat.name) &&
+      cat.name !== "Tech for Tomorrow" &&
+      cat.name !== seriesName &&
+      !sdgKeywords.some(sdg => cat.name.includes(sdg)) &&
+      !cat.name.toLowerCase().includes("day")
+    )
+  };
 
   return (
     <div className="space-y-12 mt-16">
@@ -327,30 +384,14 @@ export function ArticleExtras({ authors, categories, tags, primaryCategoryName, 
       {/* Categories / Filed Under Section */}
       {secondaryCategories.length > 0 && (
         <div className="border-t border-stone-200 pt-12">
-          <p className="font-heading text-xs font-bold uppercase tracking-widest text-stone-400 mb-6 px-2">Filed Under</p>
-          <div className="flex flex-wrap gap-2 px-2">
-            {displayCategories.map((cat) => (
-              <a
-                key={cat.slug}
-                href={`/category/${cat.slug}`}
-                className="px-4 py-1.5 rounded-full border border-stone-200 bg-stone-50/50 text-xs font-heading font-bold text-stone-600 hover:bg-brand-light hover:border-brand-primary/30 hover:text-brand-primary transition-all flex items-center gap-1.5"
-              >
-                {cat.name}
-              </a>
-            ))}
+          <p className="font-heading text-xs font-bold uppercase tracking-widest text-stone-400 mb-8 px-2">Filed Under</p>
+          <div className="space-y-6 px-2">
+            <CategoryGroup label="Region" categories={grouped.Region} />
+            <CategoryGroup label="Series" categories={grouped.Series} />
+            <CategoryGroup label="SDGs" categories={grouped.SDGs} showMoreThreshold={5} />
+            <CategoryGroup label="World Days" categories={grouped["World Days"]} showMoreThreshold={5} />
+            <CategoryGroup label="Themes" categories={grouped.Other} showMoreThreshold={5} />
           </div>
-          {secondaryCategories.length > CAT_LIMIT && (
-            <button
-              onClick={() => setShowAllCategories(!showAllCategories)}
-              className="text-stone-400 hover:text-brand-primary text-[10px] font-heading font-bold uppercase tracking-widest flex items-center gap-1 mt-4 self-start px-2 py-2"
-            >
-              {showAllCategories ? (
-                <>Show Less <ChevronUp className="w-3 h-3" /></>
-              ) : (
-                <>Show All Categories <ChevronDown className="w-3 h-3" /></>
-              )}
-            </button>
-          )}
         </div>
       )}
 
