@@ -26,6 +26,7 @@ In `.env.local`:
 WORDPRESS_GRAPHQL_URL=https://susinsight.com/graphql
 USE_WORDPRESS_CONTENT=false
 PREVIEW_SECRET=<long-random-string>
+REVALIDATE_SECRET=<long-random-string>
 WP_PREVIEW_TOKEN=
 NEXT_PUBLIC_SITE_URL=https://susinsight.vercel.app
 ```
@@ -72,6 +73,35 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/api/draft?secret=...&type=page&slug=/about/` enable draft mode and open a page preview
 - `/api/draft?secret=...&type=page&id=<wp-page-id>` preview a WP page by database ID
 - `/api/exit-draft` disable draft mode
+- `/api/revalidate` on-demand cache revalidation for post/page/taxonomy/author updates
+- `/robots.txt` generated robots policy
+
+### WordPress webhook for instant updates
+
+Use your WordPress webhook/plugin to call your frontend:
+
+`POST https://susinsight.vercel.app/api/revalidate?secret=YOUR_REVALIDATE_SECRET`
+
+Example JSON payload:
+
+```json
+{
+  "postType": "post",
+  "slug": "how-invisible-networks-are-powering-the-next-economic-leap",
+  "categorySlug": "insightful-articles",
+  "tagSlug": "digital-infrastructure",
+  "authorSlug": "adetumilara-adetayo"
+}
+```
+
+For page updates:
+
+```json
+{
+  "postType": "page",
+  "slug": "/about/"
+}
+```
 
 ## Notes
 
