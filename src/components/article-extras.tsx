@@ -273,6 +273,44 @@ export function TagsSection({ tags, limit = 11 }: { tags: TaxonomyItem[]; limit?
     </div>
   );
 }
+export function AuthorSection({ authors }: { authors: { name: string; avatar?: string; bio?: string }[] }) {
+  if (!authors.length) return null;
+
+  return (
+    <div className="border-t border-stone-200 pt-12 mt-12">
+      <p className="font-heading text-xs font-bold uppercase tracking-widest text-stone-400 mb-8 px-2">Written By</p>
+      <div className="grid grid-cols-1 gap-10">
+        {authors.map((author, i) => (
+          <div key={i} className="flex items-center gap-6 group px-2">
+            <a
+              href={`/author/${author.name.toLowerCase().replace(/\s+/g, '-')}`}
+              className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200 shadow-sm hover:border-brand-primary/30 transition-all"
+            >
+              {author.avatar ? (
+                <img src={author.avatar} alt={author.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-stone-400 bg-stone-50">
+                  <span className="text-2xl font-bold">{author.name.charAt(0)}</span>
+                </div>
+              )}
+            </a>
+            <div className="flex-1">
+              <a
+                href={`/author/${author.name.toLowerCase().replace(/\s+/g, '-')}`}
+                className="font-heading font-bold text-lg text-brand-dark hover:text-brand-primary hover:underline transition-colors block mb-1"
+              >
+                {author.name}
+              </a>
+              <p className="font-body text-stone-600 text-sm leading-relaxed max-w-xl">
+                {author.bio || `${author.name} is a contributing writer at Susinsight, exploring systems and progress across Africa.`}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function ArticleExtras({ authors, categories, tags, primaryCategoryName, seriesName }: ArticleExtrasProps) {
   const [showAllCategories, setShowAllCategories] = useState(false);
@@ -284,37 +322,7 @@ export function ArticleExtras({ authors, categories, tags, primaryCategoryName, 
 
   return (
     <div className="space-y-12 mt-16">
-
-      {/* Author Bio Section */}
-      <div className="border-t border-stone-200 pt-12">
-        <p className="font-heading text-xs font-bold uppercase tracking-widest text-stone-400 mb-8 px-2">Written By</p>
-        <div className="grid grid-cols-1 gap-8">
-          {authors.map((author, i) => (
-            <div key={i} className="flex items-start gap-4 md:gap-6 bg-stone-50/50 p-6 rounded-2xl border border-stone-100">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-stone-200 flex-shrink-0 border-2 border-white shadow-sm">
-                {author.avatar ? (
-                  <img src={author.avatar} alt={author.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-stone-400">
-                    <span className="text-2xl font-bold">{author.name.charAt(0)}</span>
-                  </div>
-                )}
-              </div>
-              <div className="flex-1">
-                <h4 className="font-heading font-bold text-lg text-brand-dark mb-2">{author.name}</h4>
-                <p className="font-body text-stone-600 text-sm leading-relaxed mb-4 max-w-2xl">
-                  {author.bio || "Editorial contributor at Susinsight, focusing on sustainability and progress across the African continent."}
-                </p>
-                <div className="flex gap-4">
-                  <a href={`/author/${author.name.toLowerCase().replace(/\s+/g, '-')}`} className="text-brand-primary text-xs font-heading font-bold hover:underline inline-flex items-center gap-1">
-                    View Profile
-                  </a>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <AuthorSection authors={authors} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-stone-200 pt-12 h-full">
         {/* Secondary Categories */}

@@ -20,6 +20,7 @@ import {
   ArticleClap,
   ArticleActionsMobile,
   SeriesCallout,
+  AuthorSection,
   TagsSection,
   ArticleTextSizeControls,
   FeaturedImageWithCaption
@@ -277,11 +278,29 @@ async function ExampleArticlePage() {
               <div className="grid md:grid-cols-2 gap-4 border-y border-stone-200 py-4 mb-8 text-sm">
                 <div>
                   <p className="font-heading text-xs uppercase tracking-widest text-stone-500 mb-1">Authors</p>
-                  <p className="font-body text-brand-dark">{exampleArticle.authors.join(" · ")}</p>
+                  <div className="font-body text-brand-dark flex flex-wrap gap-2">
+                    {exampleArticle.authors.map((author, i) => (
+                      <React.Fragment key={author}>
+                        <a href={`/author/${author.toLowerCase().replace(/\s+/g, '-')}`} className="hover:underline hover:text-brand-primary transition-colors">
+                          {author}
+                        </a>
+                        {i < exampleArticle.authors.length - 1 && <span>·</span>}
+                      </React.Fragment>
+                    ))}
+                  </div>
                 </div>
                 <div>
                   <p className="font-heading text-xs uppercase tracking-widest text-stone-500 mb-1">Editors</p>
-                  <p className="font-body text-brand-dark">{exampleArticle.editors.join(" · ")}</p>
+                  <div className="font-body text-brand-dark flex flex-wrap gap-2">
+                    {exampleArticle.editors.map((editor, i) => (
+                      <React.Fragment key={editor}>
+                        <a href={`/author/${editor.toLowerCase().replace(/\s+/g, '-')}`} className="hover:underline hover:text-brand-primary transition-colors">
+                          {editor}
+                        </a>
+                        {i < exampleArticle.editors.length - 1 && <span>·</span>}
+                      </React.Fragment>
+                    ))}
+                  </div>
                 </div>
                 <div>
                   <p className="font-heading text-xs uppercase tracking-widest text-stone-500 mb-1">Published</p>
@@ -323,6 +342,13 @@ async function ExampleArticlePage() {
               <SeriesCallout seriesName="Tech for Tomorrow" />
 
               <ArticleActionsMobile title={exampleArticle.title} />
+
+              <AuthorSection
+                authors={exampleArticle.authors.map(author => ({
+                  name: author,
+                  bio: `${author} is a Contributing Researcher and Writer at Susinsight, focusing on sustainable systemic change.`
+                }))}
+              />
 
               <div className="border-t border-stone-200 pt-8 mt-10">
                 <TagsSection tags={exampleArticle.tags.map(tag => ({ name: tag, slug: tag.toLowerCase().replace(/\s+/g, '-') }))} />
@@ -389,7 +415,12 @@ export default async function StoryPage({ params }: PageProps) {
               <h1 className="font-heading font-bold text-[32px] md:text-[45px] leading-[1.05] mb-6">{stripHtml(post.title)}</h1>
 
               <div className="font-heading text-xs uppercase tracking-widest text-stone-500 mb-6 flex gap-3">
-                <span>{post.author?.node?.name || "Susinsight Staff"}</span>
+                <a
+                  href={`/author/${(post.author?.node?.name || "Susinsight Staff").toLowerCase().replace(/\s+/g, '-')}`}
+                  className="hover:underline hover:text-brand-primary transition-colors"
+                >
+                  {post.author?.node?.name || "Susinsight Staff"}
+                </a>
                 <span>•</span>
                 <span>{formatDate(post.date)}</span>
               </div>
