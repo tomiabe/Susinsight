@@ -49,14 +49,14 @@ function InlineNewsletter() {
     <aside className="my-16 border border-brand-primary/15 bg-brand-light/50 p-8 md:p-10 rounded-2xl relative overflow-hidden">
       <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/5 rounded-full -mr-16 -mt-16" />
       <div className="relative z-10">
-        <div className="flex items-center gap-2.5 mb-8">
+        <div className="flex items-center gap-2.5 mb-8 justify-center md:justify-start">
           <Mail className="w-4 h-4 text-brand-primary" aria-hidden="true" />
-          <p className="font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-brand-primary m-0 leading-none">
+          <p className="font-heading text-[10px] font-bold uppercase tracking-widest text-brand-primary m-0 leading-none">
             Newsletter
           </p>
         </div>
-        <h3 className="font-heading font-bold text-2xl text-brand-dark mb-4 leading-tight">Get Susinsight in your inbox</h3>
-        <p className="font-body text-stone-600 mb-8 leading-relaxed text-sm">
+        <h3 className="font-heading font-bold text-2xl text-brand-dark mb-4 leading-tight text-center md:text-left">Get Susinsight in your inbox</h3>
+        <p className="font-body text-stone-600 mb-8 leading-relaxed text-sm text-center md:text-left">
           Weekly context on policy, infrastructure, markets, and the people building new systems in Africa.
         </p>
         <form className="flex flex-col sm:flex-row gap-3">
