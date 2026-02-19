@@ -23,6 +23,7 @@ import {
   AuthorSection,
   TagsSection,
   ArticleTextSizeControls,
+  ArticleAudioPlayer,
   FeaturedImageWithCaption
 } from "@/components/article-extras";
 
@@ -319,7 +320,10 @@ async function ExampleArticlePage() {
               />
 
               <div className="mb-8">
-                <ArticleTextSizeControls />
+                <div className="flex flex-wrap items-center gap-4">
+                  <ArticleTextSizeControls />
+                  <ArticleAudioPlayer />
+                </div>
               </div>
 
               <div className="story-content">
@@ -435,7 +439,10 @@ export default async function StoryPage({ params }: PageProps) {
               />
 
               <div className="mb-8">
-                <ArticleTextSizeControls />
+                <div className="flex flex-wrap items-center gap-4">
+                  <ArticleTextSizeControls />
+                  <ArticleAudioPlayer />
+                </div>
               </div>
 
               <div

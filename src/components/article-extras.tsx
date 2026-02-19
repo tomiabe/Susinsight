@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp, Link as LinkIcon, ArrowRight, Share2, Facebook, Twitter, Linkedin, MessageSquare, Minus, Plus, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, Link as LinkIcon, ArrowRight, Share2, Facebook, Twitter, Linkedin, MessageSquare, Minus, Plus, Search, Volume2, Pause, Play, Square, Settings } from "lucide-react";
 import { useEffect } from "react";
 
 // --- Original Components Restored Below ---
@@ -181,6 +181,240 @@ export function ArticleTextSizeControls() {
       >
         <span className="text-sm font-body font-bold">A+</span>
       </button>
+    </div>
+  );
+}
+
+export function ArticleAudioPlayer() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [synth, setSynth] = useState<SpeechSynthesis | null>(null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoiceName, setSelectedVoiceName] = useState<string>("");
+  const [rate, setRate] = useState(1);
+  const [showSettings, setShowSettings] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const s = window.speechSynthesis;
+      setSynth(s);
+
+      const loadVoices = () => {
+        const availableVoices = s.getVoices();
+        setVoices(availableVoices);
+
+        if (!selectedVoiceName && availableVoices.length > 0) {
+          const preferred = availableVoices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('google'))
+            || availableVoices.find(v => v.lang.startsWith('en'))
+            || availableVoices[0];
+          if (preferred) setSelectedVoiceName(preferred.name);
+        }
+      };
+
+      loadVoices();
+      if (s.onvoiceschanged !== undefined) {
+        s.onvoiceschanged = loadVoices;
+      }
+    }
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [selectedVoiceName]);
+
+  const getLanguage = () => {
+    const langAttr = document.documentElement.lang;
+    return langAttr || 'en';
+  };
+
+  const handlePlay = () => {
+    if (!synth) return;
+
+    if (isPaused) {
+      synth.resume();
+      setIsPaused(false);
+      setIsPlaying(true);
+      return;
+    }
+
+    synth.cancel();
+
+    const fragments: string[] = [];
+
+    // 1. Headline
+    const headline = document.querySelector('h1');
+    if (headline) fragments.push(headline.textContent?.trim() || "");
+
+    // 2. Excerpt / Subheadline
+    const excerpt = document.querySelector('article > p.font-serif') || document.querySelector('.story-content p:first-child');
+    if (excerpt && !fragments.includes(excerpt.textContent?.trim() || "")) {
+      fragments.push(excerpt.textContent?.trim() || "");
+    }
+
+    // Note: Skipping authors, editors, and date as per request
+
+    // 3. Main Article Sections
+    const storyContent = document.querySelector('.story-content');
+    if (storyContent) {
+      const elements = Array.from(storyContent.querySelectorAll('p, h2, h3'));
+      elements.forEach(el => {
+        // Skip newsletter and other UI callouts
+        // We look for common newsletter patterns or containers
+        const text = el.textContent?.trim();
+        if (!text) return;
+
+        const isNewsletter = el.closest('.bg-brand-light') ||
+          el.closest('form') ||
+          text.toLowerCase().includes('subscribe') ||
+          text.toLowerCase().includes('newsletter');
+
+        if (!isNewsletter) {
+          // Avoid duplicating the excerpt if it was the first paragraph
+          if (!fragments.includes(text)) {
+            fragments.push(text);
+          }
+        }
+      });
+    }
+
+    const fullText = fragments.join(". ");
+    if (!fullText) return;
+
+    const utterance = new SpeechSynthesisUtterance(fullText);
+    const voice = voices.find(v => v.name === selectedVoiceName);
+    if (voice) utterance.voice = voice;
+    utterance.rate = rate;
+    utterance.pitch = 1.0;
+    utterance.lang = getLanguage();
+
+    utterance.onend = () => {
+      setIsPlaying(false);
+      setIsPaused(false);
+    };
+
+    utterance.onerror = () => {
+      setIsPlaying(false);
+      setIsPaused(false);
+    };
+
+    synth.speak(utterance);
+    setIsPlaying(true);
+  };
+
+  const handlePause = () => {
+    if (synth && isPlaying) {
+      synth.pause();
+      setIsPaused(true);
+      setIsPlaying(false);
+    }
+  };
+
+  const handleStop = () => {
+    if (synth) {
+      synth.cancel();
+      setIsPlaying(false);
+      setIsPaused(false);
+    }
+  };
+
+  const currentLang = getLanguage().split('-')[0];
+  const filteredVoices = voices.filter(v => v.lang.startsWith(currentLang));
+
+  return (
+    <div className="flex items-center gap-1 bg-white border border-stone-200 rounded-full p-1 shadow-sm h-[42px] relative">
+      {!isPlaying && !isPaused ? (
+        <button
+          onClick={handlePlay}
+          className="px-4 h-full flex items-center justify-center gap-2 hover:bg-stone-50 text-stone-600 hover:text-brand-primary transition-all rounded-full group"
+          aria-label="Listen to article"
+        >
+          <Volume2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <span className="text-[10px] font-body font-bold uppercase tracking-wider">Listen</span>
+        </button>
+      ) : (
+        <div className="flex items-center h-full gap-1">
+          {isPlaying ? (
+            <button
+              onClick={handlePause}
+              className="w-8 h-full flex items-center justify-center hover:bg-stone-50 text-brand-primary transition-all rounded-l-full"
+              aria-label="Pause"
+            >
+              <Pause className="w-4 h-4 fill-current" />
+            </button>
+          ) : (
+            <button
+              onClick={handlePlay}
+              className="w-8 h-full flex items-center justify-center hover:bg-stone-50 text-brand-primary transition-all rounded-l-full"
+              aria-label="Resume"
+            >
+              <Play className="w-4 h-4 fill-current" />
+            </button>
+          )}
+          <div className="h-4 w-px bg-stone-200"></div>
+          <button
+            onClick={handleStop}
+            className="w-8 h-full flex items-center justify-center hover:bg-stone-50 text-stone-400 hover:text-red-500 transition-all group"
+            aria-label="Stop"
+          >
+            <Square className="w-3 h-3 fill-current group-hover:scale-110 transition-transform" />
+          </button>
+        </div>
+      )}
+
+      <div className="h-4 w-px bg-stone-200"></div>
+
+      <button
+        onClick={() => setShowSettings(!showSettings)}
+        className={`w-10 h-full flex items-center justify-center rounded-r-full hover:bg-stone-50 transition-all ${showSettings ? 'text-brand-primary' : 'text-stone-400'}`}
+        aria-label="Audio settings"
+      >
+        <Settings className={`w-4 h-4 ${showSettings ? 'animate-spin-slow' : ''}`} />
+      </button>
+
+      {showSettings && (
+        <div className="absolute top-full mt-2 right-0 w-72 bg-white border border-stone-200 rounded-2xl shadow-xl z-50 p-5 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="space-y-5">
+            <div>
+              <label className="block font-heading text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2">Voice Selector</label>
+              <select
+                value={selectedVoiceName}
+                onChange={(e) => setSelectedVoiceName(e.target.value)}
+                className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs font-body focus:outline-none focus:border-brand-primary/30"
+              >
+                {filteredVoices.map(v => (
+                  <option key={v.name} value={v.name}>{v.name}</option>
+                ))}
+                {filteredVoices.length === 0 && voices.map(v => (
+                  <option key={v.name} value={v.name}>{v.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block font-heading text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2 flex justify-between">
+                Reading Speed <span>{rate}x</span>
+              </label>
+              <div className="space-y-2">
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.25"
+                  value={rate}
+                  onChange={(e) => setRate(parseFloat(e.target.value))}
+                  className="w-full accent-brand-primary h-1.5 bg-stone-100 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-[8px] font-heading font-bold text-stone-300 uppercase tracking-tighter">
+                  <span>Slow</span>
+                  <span>Normal</span>
+                  <span>Fast</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
